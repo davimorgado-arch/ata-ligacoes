@@ -1,0 +1,24 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Teste de microfone</title>
+<style>body{font-family:-apple-system,system-ui,sans-serif;margin:0;padding:20px;background:#0f172a;color:#e2e8f0}
+h1{font-size:20px}button{width:100%;padding:18px;font-size:18px;border:0;border-radius:14px;margin:8px 0;color:#fff;background:#2563eb}
+#parar{background:#dc2626}#st{margin:12px 0;padding:10px;border-radius:10px;background:#1e293b}
+#txt{white-space:pre-wrap;min-height:200px;padding:12px;border-radius:12px;background:#1e293b;font-size:16px}
+.int{color:#94a3b8}</style></head><body>
+<h1>Teste de transcrição (nada é gravado)</h1>
+<div id="st">Pronto. Toque em Iniciar e fale.</div>
+<button id="ini">Iniciar</button><button id="parar">Parar</button>
+<div id="txt"></div>
+<script>
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;const st=document.getElementById('st'),tx=document.getElementById('txt');
+let rec,on=false,fin='';
+if(!SR){st.textContent='❌ Este navegador não tem transcrição. No iPhone use o Safari (com Siri/Ditado ligados); no Android, o Chrome.';}
+function start(){if(!SR)return;rec=new SR();rec.lang='pt-BR';rec.continuous=true;rec.interimResults=true;
+rec.onstart=()=>st.textContent='🎙️ Ouvindo...';
+rec.onresult=e=>{let it='';for(let i=e.resultIndex;i<e.results.length;i++){const r=e.results[i];if(r.isFinal)fin+=r[0].transcript+' ';else it+=r[0].transcript;}tx.innerHTML=fin+'<span class="int">'+it+'</span>';};
+rec.onerror=e=>{st.textContent='⚠️ Erro: '+e.error+(e.error==='not-allowed'?' (microfone bloqueado)':e.error==='audio-capture'?' (microfone em uso por outro app/ligação)':'');};
+rec.onend=()=>{if(on){try{rec.start()}catch(e){}}else st.textContent='Parado.';};
+try{rec.start()}catch(e){st.textContent='⚠️ '+e.message}}
+document.getElementById('ini').onclick=()=>{on=true;start()};
+document.getElementById('parar').onclick=()=>{on=false;rec&&rec.stop()};
+</script></body></html>

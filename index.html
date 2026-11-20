@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#006058">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ata Lupe">
+<meta name="referrer" content="no-referrer">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>Ata de ligações</title>
+<style>
+:root{
+  --brand:#006058; --brand-2:#0a7d72; --brand-soft:#e6f2f0; --accent:#ffb507;
+  --bg:#f4f6f6; --card:#fff; --text:#13201f; --muted:#5f6f6d; --line:#e2e8e7;
+  --danger:#c62828; --ok:#1b8a4b; --radius:16px;
+  --safe-top:env(safe-area-inset-top,0px); --safe-bot:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text);
+  font:16px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+button{font:inherit;border:0;cursor:pointer}
+.screen{display:none;min-height:100%;flex-direction:column}
+.screen.on{display:flex}
+header.top{position:sticky;top:0;z-index:5;background:var(--brand);color:#fff;
+  padding:calc(14px + var(--safe-top)) 18px 14px;display:flex;align-items:center;gap:12px}
+header.top h1{font-size:20px;margin:0;font-weight:700;flex:1;letter-spacing:-.2px}
+header.top .sub{font-size:12px;opacity:.8;font-weight:500;display:block}
+.iconbtn{width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.14);color:#fff;
+  display:grid;place-items:center}
+.iconbtn svg{width:22px;height:22px}
+.searchwrap{background:var(--brand);padding:0 16px 16px;position:sticky;top:calc(68px + var(--safe-top));z-index:4}
+.search{display:flex;align-items:center;gap:8px;background:#fff;border-radius:14px;padding:0 14px;height:48px;
+  box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.search input{flex:1;border:0;outline:0;font-size:16px;background:transparent;color:var(--text)}
+.search svg{width:20px;height:20px;color:var(--muted)}
+.meta{display:flex;justify-content:space-between;align-items:center;padding:12px 18px 4px;color:var(--muted);font-size:13px}
+.meta button{background:none;color:var(--brand);font-weight:600;font-size:13px;padding:6px 0}
+.list{padding:6px 14px calc(120px + var(--safe-bot));display:flex;flex-direction:column;gap:10px}
+.lead{background:var(--card);border-radius:var(--radius);padding:14px 16px;border:2px solid transparent;
+  box-shadow:0 1px 3px rgba(16,40,38,.06);text-align:left;width:100%;color:var(--text)}
+.lead.sel{border-color:var(--brand);background:var(--brand-soft)}
+.lead .nm{font-weight:700;font-size:16px;line-height:1.25}
+.lead .rs{color:var(--muted);font-size:13px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lead .row{display:flex;flex-wrap:wrap;gap:6px 10px;margin-top:8px;align-items:center;font-size:12px;color:var(--muted)}
+.pill{display:inline-block;padding:3px 9px;border-radius:999px;font-weight:600;font-size:12px;background:#eef1f1;color:#36504d}
+.pill.etapa{background:#fff4d6;color:#7a5600}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.empty{text-align:center;color:var(--muted);padding:40px 20px}
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:6;background:#fff;border-top:1px solid var(--line);
+  padding:12px 16px calc(12px + var(--safe-bot));box-shadow:0 -6px 24px rgba(0,0,0,.06);transform:translateY(110%);transition:transform .2s}
+.bar.on{transform:none}
+.bar .who{font-size:13px;color:var(--muted);margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar .who b{color:var(--text)}
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:54px;border-radius:14px;
+  font-weight:700;font-size:17px;background:var(--brand);color:#fff}
+.btn:active{filter:brightness(.92)}
+.btn[disabled]{opacity:.5}
+.btn.ghost{background:#eef2f1;color:var(--text)}
+.btn.red{background:var(--danger)}
+.btn.amber{background:var(--accent);color:#2b1d00}
+.btn svg{width:22px;height:22px}
+.row2{display:flex;gap:10px}
+.row2 .btn{flex:1}
+.call-head{background:var(--brand);color:#fff;padding:calc(12px + var(--safe-top)) 18px 22px}
+.call-head .back{background:none;color:#fff;opacity:.85;padding:6px 0;font-size:15px;display:flex;align-items:center;gap:4px}
+.call-head .nm{font-size:22px;font-weight:800;margin-top:6px;line-height:1.2}
+.call-head .info{font-size:13px;opacity:.85;margin-top:4px}
+.status{display:flex;align-items:center;gap:10px;margin-top:16px}
+.dot{width:12px;height:12px;border-radius:50%;background:#9fb9b5}
+.dot.live{background:#ff5a5a;box-shadow:0 0 0 0 rgba(255,90,90,.7);animation:pulse 1.4s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 12px rgba(255,90,90,0)}100%{box-shadow:0 0 0 0 rgba(255,90,90,0)}}
+.timer{font-variant-numeric:tabular-nums;font-weight:700;font-size:28px;margin-left:auto}
+.stxt{font-size:14px;font-weight:600}
+.body{padding:16px 16px calc(150px + var(--safe-bot));display:flex;flex-direction:column;gap:14px}
+.card{background:#fff;border-radius:var(--radius);padding:14px 16px;box-shadow:0 1px 3px rgba(16,40,38,.06)}
+.card h3{margin:0 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted)}
+.tx{min-height:180px;max-height:46vh;overflow:auto;white-space:pre-wrap;font-size:15px;line-height:1.5}
+.tx .interim{color:#8aa09d}
+.tx .ph{color:#9aaaa8}
+textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px;font:inherit;font-size:15px;
+  resize:vertical;min-height:90px;outline:0;background:#fbfcfc;color:var(--text)}
+textarea:focus{border-color:var(--brand)}
+textarea.big{min-height:260px}
+.note{font-size:13px;color:#6b4e00;background:#fff6dc;border-radius:12px;padding:10px 12px;line-height:1.45}
+.note.err{color:#7f1d1d;background:#fde8e8}
+.foot{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);
+  padding:12px 16px calc(12px + var(--safe-bot));display:flex;flex-direction:column;gap:10px;z-index:6}
+.center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center;gap:14px}
+.big-ok{width:84px;height:84px;border-radius:50%;background:var(--brand-soft);color:var(--brand);display:grid;place-items:center}
+.big-ok svg{width:44px;height:44px}
+label.f{display:block;font-size:13px;color:var(--muted);font-weight:600;margin:14px 0 6px}
+input.f{width:100%;height:48px;border:1px solid var(--line);border-radius:12px;padding:0 12px;font:inherit;font-size:15px;background:#fff}
+.toast{position:fixed;left:50%;top:calc(16px + var(--safe-top));transform:translate(-50%,-150%);background:#13201f;color:#fff;
+  padding:10px 16px;border-radius:12px;font-size:14px;z-index:50;transition:transform .25s;max-width:90vw}
+.toast.on{transform:translate(-50%,0)}
+.hist{padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.hist .it{background:#fff;border-radius:12px;padding:12px 14px;font-size:14px}
+.st-Lançada{background:#e3f4ea;color:var(--ok)} .st-Pendente{background:#fff4d6;color:#7a5600} .st-Erro{background:#fde8e8;color:var(--danger)}
+.spin{width:22px;height:22px;border:3px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:sp 0.8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<!-- ===================== CONFIGURAÇÃO ===================== -->
+<section class="screen" id="s-config">
+  <header class="top"><h1>Configurar app<span class="sub">Feito uma vez por aparelho</span></h1></header>
+  <div class="body">
+    <div class="card">
+      <p style="margin:0 0 4px">Abra o <b>link do app</b> que o script da sua planilha gerou (função <i>gerarLinkDoApp</i>). Ou cole os dados abaixo.</p>
+      <label class="f" for="cfg-api">URL do App da Web (termina em /exec)</label>
+      <input class="f" id="cfg-api" inputmode="url" autocomplete="off" placeholder="https://script.google.com/macros/s/.../exec">
+      <label class="f" for="cfg-tok">Código do app</label>
+      <input class="f" id="cfg-tok" autocomplete="off" placeholder="código gerado no setup">
+    </div>
+    <div class="note err" id="cfg-err" hidden></div>
+    <button class="btn" id="cfg-save">Conectar</button>
+  </div>
+</section>
+
+<!-- ===================== LISTA DE LEADS ===================== -->
+<section class="screen" id="s-list">
+  <header class="top">
+    <h1>Ligações<span class="sub" id="who">Meu funil no Lupe</span></h1>
+    <button class="iconbtn" id="btn-hist" aria-label="Envios"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/><path d="M12 7v5l3 2"/></svg></button>
+    <button class="iconbtn" id="btn-reload" aria-label="Atualizar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></svg></button>
+  </header>
+  <div class="searchwrap">
+    <div class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="Buscar por empresa, CNPJ ou ID" autocomplete="off" enterkeyhint="search">
+    </div>
+  </div>
+  <div class="meta"><span id="count">Carregando…</span><span id="upd"></span></div>
+  <div class="list" id="list"></div>
+  <div class="bar" id="bar">
+    <div class="who">Lead escolhido: <b id="bar-nm">—</b></div>
+    <button class="btn" id="btn-start"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.9V21h2v-2.1A7 7 0 0 0 19 12h-2Z"/></svg>Iniciar ligação</button>
+  </div>
+</section>
+
+<!-- ===================== LIGAÇÃO ===================== -->
+<section class="screen" id="s-call">
+  <div class="call-head">
+    <button class="back" id="call-back">‹ Leads</button>
+    <div class="nm" id="call-nm">—</div>
+    <div class="info" id="call-info"></div>
+    <div class="status"><span class="dot" id="dot"></span><span class="stxt" id="stxt">Pronto para ouvir</span><span class="timer" id="timer">00:00</span></div>
+  </div>
+  <div class="body">
+    <div class="note" id="call-tip">Ligação no <b>viva-voz</b>, aparelho perto. Só o texto é guardado; o áudio <b>não é gravado</b>.<br>Se a ligação estiver <b>neste mesmo celular</b>, o sistema pode bloquear o microfone: use outro aparelho (notebook ou tablet) perto do viva-voz, ou dite um resumo logo após desligar.</div>
+    <div class="note err" id="call-err" hidden></div>
+    <div class="card"><h3>Transcrição ao vivo</h3><div class="tx" id="tx"><span class="ph">A transcrição aparece aqui…</span></div></div>
+    <div class="card"><h3>Anotações</h3><textarea id="notas" placeholder="Ex.: decisor é o Carlos, fatura vence dia 10, retornar quinta…"></textarea></div>
+  </div>
+  <div class="foot">
+    <div class="row2">
+      <button class="btn ghost" id="btn-pause">Pausar</button>
+      <button class="btn red" id="btn-end">Encerrar</button>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== REVISÃO ===================== -->
+<section class="screen" id="s-review">
+  <header class="top"><button class="iconbtn" id="rev-back" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg></button><h1>Revisar<span class="sub" id="rev-nm">—</span></h1></header>
+  <div class="body">
+    <div class="card"><h3>Transcrição (pode editar)</h3><textarea class="big" id="rev-tx"></textarea></div>
+    <div class="card"><h3>Anotações</h3><textarea id="rev-notas"></textarea></div>
+    <div class="note">O bot escreve a ata a partir deste texto e lança no Lupe em até 30 min. Confira o lead: <b id="rev-lead"></b></div>
+    <div class="note err" id="rev-err" hidden></div>
+  </div>
+  <div class="foot">
+    <button class="btn" id="btn-send">Enviar</button>
+    <button class="btn ghost" id="btn-discard">Descartar</button>
+  </div>
+</section>
+
+<!-- ===================== ENVIADO ===================== -->
+<section class="screen" id="s-done">
+  <div class="center">
+    <div class="big-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></div>
+    <h2 style="margin:0">Enviado para a fila</h2>
+    <p style="margin:0;color:var(--muted)" id="done-txt">O bot lança a ata no Lupe em até 30 min.</p>
+    <div class="note" id="done-warn" hidden></div>
+    <button class="btn" id="btn-new" style="max-width:360px">Nova ligação</button>
+  </div>
+</section>
+
+<!-- ===================== ENVIOS ===================== -->
+<section class="screen" id="s-hist">
+  <header class="top"><button class="iconbtn" id="hist-back" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg></button><h1>Últimos envios<span class="sub">Status no Lupe</span></h1></header>
+  <div class="hist" id="hist"></div>
+  <div style="padding:8px 16px 30px"><button class="btn ghost" id="btn-reset">Trocar configuração</button></div>
+</section>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+var LS = {
+  get: function(k, d){ try{ var v = localStorage.getItem('ata.'+k); return v==null ? d : JSON.parse(v); }catch(e){ return d; } },
+  set: function(k, v){ try{ localStorage.setItem('ata.'+k, JSON.stringify(v)); }catch(e){} },
+  del: function(k){ try{ localStorage.removeItem('ata.'+k); }catch(e){} }
+};
+var $ = function(id){ return document.getElementById(id); };
+var state = { leads: LS.get('leads', []), sel: null, call: null };
+
+/* ---------- utilidades ---------- */
+function show(id){ document.querySelectorAll('.screen').forEach(function(s){ s.classList.toggle('on', s.id===id); }); window.scrollTo(0,0); }
+var toastT;
+function toast(msg){ var t=$('toast'); t.textContent=msg; t.classList.add('on'); clearTimeout(toastT); toastT=setTimeout(function(){ t.classList.remove('on'); }, 2600); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function norm(s){ return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
+function digits(s){ return String(s||'').replace(/\D/g,''); }
+function fmtCnpj(s){ var d=digits(s); return d.length===14 ? d.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/,'$1.$2.$3/$4-$5') : (s||''); }
+function uid(){ return 'L' + Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+function mmss(ms){ var s=Math.floor(ms/1000); return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); }
+function stamp(ms){ return '['+mmss(ms)+'] '; }
+
+/* ---------- API (planilha do vendedor via Apps Script) ---------- */
+function cfg(){ return LS.get('cfg', null); }
+function api(acao, extra){
+  var c = cfg();
+  if(!c) return Promise.reject(new Error('App não configurado.'));
+  var body = Object.assign({ acao: acao, token: c.token }, extra||{});
+  // text/plain evita o "preflight" CORS, que o Apps Script não responde.
+  return fetch(c.api, { method:'POST', body: JSON.stringify(body), headers:{'Content-Type':'text/plain;charset=utf-8'}, redirect:'follow' })
+    .then(function(r){ if(!r.ok) throw new Error('Servidor respondeu '+r.status); return r.json(); })
+    .then(function(j){ if(!j.ok) throw new Error(j.erro||'Erro desconhecido'); return j; });
+}
+
+/* ---------- configuração (link com #api=...&t=...) ---------- */
+function readHash(){
+  var h = location.hash.replace(/^#/,''); if(!h) return;
+  var p = new URLSearchParams(h);
+  if(p.get('api') && p.get('t')) LS.set('cfg', { api: p.get('api'), token: p.get('t') });
+}
+function saveCfg(){
+  var a = $('cfg-api').value.trim(), t = $('cfg-tok').value.trim(), e = $('cfg-err');
+  e.hidden = true;
+  if(!/^https:\/\/script\.google(usercontent)?\.com\//.test(a) && !/^https?:\/\/(localhost|127\.0\.0\.1)/.test(a)){ e.textContent='A URL deve ser do Google Apps Script (https://script.google.com/…/exec).'; e.hidden=false; return; }
+  if(t.length < 16){ e.textContent='Código do app inválido.'; e.hidden=false; return; }
+  LS.set('cfg', { api:a, token:t });
+  boot();
+}
+
+/* ---------- lista ---------- */
+function renderList(){
+  var q = norm($('q').value), qd = digits($('q').value);
+  var leads = state.leads.filter(function(l){
+    if(!q) return true;
+    var hay = norm([l.empresa,l.razao_social,l.etapa,l.lead_id].join(' '));
+    return hay.indexOf(q)!==-1 || (qd.length>=3 && (digits(l.cnpj).indexOf(qd)!==-1 || String(l.lead_id).indexOf(qd)!==-1));
+  });
+  $('count').textContent = leads.length + (leads.length===1?' lead':' leads') + (q ? ' encontrados' : ' no funil');
+  var up = LS.get('leadsAt', null); $('upd').textContent = up ? 'Lista de ' + new Date(up).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '';
+  var max = 200, html = leads.slice(0,max).map(function(l){
+    var sel = state.sel && state.sel.lead_id===l.lead_id;
+    return '<button class="lead'+(sel?' sel':'')+'" data-id="'+esc(l.lead_id)+'">'+
+      '<div class="nm">'+esc(l.empresa||l.razao_social||'(sem nome)')+'</div>'+
+      (l.razao_social && l.razao_social!==l.empresa ? '<div class="rs">'+esc(l.razao_social)+'</div>' : '')+
+      '<div class="row">'+(l.etapa?'<span class="pill etapa">'+esc(l.etapa)+'</span>':'')+
+      '<span class="mono">#'+esc(l.lead_id)+'</span>'+(l.cnpj?'<span class="mono">'+esc(fmtCnpj(l.cnpj))+'</span>':'')+'</div></button>';
+  }).join('');
+  if(leads.length>max) html += '<div class="empty">Mostrando '+max+' de '+leads.length+'. Refine a busca.</div>';
+  if(!leads.length) html = '<div class="empty">'+(state.leads.length?'Nenhum lead encontrado para essa busca.':'A lista de leads está vazia. O bot atualiza todo dia às 7h.')+'</div>';
+  $('list').innerHTML = html;
+}
+function loadLeads(silent){
+  if(!silent) $('count').textContent='Atualizando…';
+  return api('leads').then(function(j){
+    state.leads = j.leads || []; LS.set('leads', state.leads);
+    var latest = state.leads.reduce(function(m,l){ return l.atualizado_em && l.atualizado_em>m ? l.atualizado_em : m; }, '');
+    LS.set('leadsAt', latest || null);
+    renderList();
+  }).catch(function(e){ renderList(); toast('Não consegui atualizar: '+e.message); });
+}
+function selectLead(id){
+  var l = state.leads.find(function(x){ return String(x.lead_id)===String(id); });
+  state.sel = (state.sel && state.sel.lead_id===id) ? null : l;
+  $('bar').classList.toggle('on', !!state.sel);
+  if(state.sel) $('bar-nm').textContent = (state.sel.empresa||state.sel.razao_social) + '  #' + state.sel.lead_id;
+  renderList();
+}
+
+/* ---------- transcrição (Web Speech API, sem gravar áudio) ---------- */
+var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+var isIOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+var standalone = window.navigator.standalone === true || (window.matchMedia && matchMedia('(display-mode: standalone)').matches);
+
+var Engine = {
+  rec:null, want:false, fails:0, lastStart:0,
+  start:function(){
+    if(!SR) return false;
+    this.want = true; this.fails = 0; this._spawn(); return true;
+  },
+  _spawn:function(){
+    var self=this, r = new SR();   // nova instância a cada reinício (mais estável no Safari)
+    r.lang='pt-BR'; r.continuous=true; r.interimResults=true; r.maxAlternatives=1;
+    r.onresult=function(ev){
+      var interim='';
+      for(var i=ev.resultIndex;i<ev.results.length;i++){
+        var res=ev.results[i], t=res[0].transcript;
+        if(res.isFinal) onFinal(t); else interim+=t;
+      }
+      onInterim(interim);
+      self.fails=0;
+    };
+    r.onerror=function(ev){
+      if(ev.error==='not-allowed' || ev.error==='service-not-allowed'){ self.want=false; onEngineError(ev.error); }
+      else if(ev.error==='audio-capture'){ self.fails+=2; onEngineWarn('Microfone ocupado ou indisponível (se o celular está em ligação, o microfone fica com a ligação).'); }
+      else if(ev.error!=='no-speech' && ev.error!=='aborted'){ self.fails++; onEngineWarn('Reconectando a transcrição ('+ev.error+')…'); }
+    };
+    r.onend=function(){
+      onInterim('');
+      if(!self.want) return;
+      if(Date.now()-self.lastStart < 1500) self.fails++;
+      if(self.fails>=6){ self.want=false; onEngineError('loop'); return; }
+      setTimeout(function(){ if(self.want) self._spawn(); }, 250 + self.fails*400);
+    };
+    this.rec=r; this.lastStart=Date.now();
+    try{ r.start(); }catch(e){ setTimeout(function(){ if(self.want) self._spawn(); }, 800); }
+  },
+  stop:function(){
+    this.want=false;
+    var r=this.rec; this.rec=null;
+    if(r){ try{ if(isIOS){ try{ r.start(); }catch(e){} } r.stop(); }catch(e){} try{ r.abort(); }catch(e){} }
+  }
+};
+
+var wakeLock=null;
+function keepAwake(on){
+  if(on && 'wakeLock' in navigator){ navigator.wakeLock.request('screen').then(function(w){ wakeLock=w; }).catch(function(){}); }
+  if(!on && wakeLock){ try{ wakeLock.release(); }catch(e){} wakeLock=null; }
+}
+
+function draft(){ LS.set('draft', state.call); }
+function callElapsed(){ var c=state.call; return c.acc + (c.running ? Date.now()-c.since : 0); }
+function onFinal(t){
+  t=t.trim(); if(!t) return;
+  var c=state.call; if(!c) return;
+  c.transcricao += (c.transcricao?'\n':'') + stamp(callElapsed()) + t;
+  draft(); renderTx('');
+}
+function onInterim(t){ renderTx(t); }
+function onEngineWarn(msg){ var e=$('call-err'); e.textContent=msg; e.hidden=false; setTimeout(function(){ if(Engine.want) e.hidden=true; }, 5000); }
+function onEngineError(code){
+  var msg = code==='loop'
+    ? 'A transcrição parou várias vezes seguidas. Verifique se o microfone está livre e toque em Retomar, ou escreva nas anotações.'
+    : 'Sem permissão de microfone/reconhecimento de voz. Libere o microfone para este site nas configurações do navegador'+(isIOS?' e ative Siri e Ditado no iPhone':'')+'.';
+  var e=$('call-err'); e.textContent=msg; e.hidden=false;
+  pauseCall(true);
+}
+function renderTx(interim){
+  var c=state.call, el=$('tx');
+  if(!c) return;
+  if(!c.transcricao && !interim){ el.innerHTML='<span class="ph">'+(c.running?'Ouvindo… fale perto do aparelho.':'A transcrição aparece aqui…')+'</span>'; return; }
+  el.innerHTML = esc(c.transcricao) + (interim ? (c.transcricao?'\n':'')+'<span class="interim">'+esc(interim)+'</span>' : '');
+  el.scrollTop = el.scrollHeight;
+}
+var tick;
+function setRunningUI(){
+  var c=state.call;
+  $('dot').classList.toggle('live', c.running);
+  $('stxt').textContent = c.running ? 'Transcrevendo' : (c.acc ? 'Pausado' : 'Pronto para ouvir');
+  $('btn-pause').textContent = c.running ? 'Pausar' : (c.acc ? 'Retomar' : 'Começar');
+  clearInterval(tick);
+  if(c.running) tick=setInterval(function(){ $('timer').textContent=mmss(callElapsed()); }, 500);
+  $('timer').textContent=mmss(callElapsed());
+}
+function openCall(resume){
+  var l=state.sel;
+  if(!resume) state.call = { id:uid(), lead_id:l.lead_id, lead_nome:(l.empresa||l.razao_social||''), cnpj:l.cnpj||'', etapa:l.etapa||'', transcricao:'', notas:'', acc:0, since:0, running:false };
+  var c=state.call;
+  $('call-nm').textContent=c.lead_nome;
+  $('call-info').textContent='#'+c.lead_id + (c.cnpj?' · '+fmtCnpj(c.cnpj):'') + (c.etapa?' · '+c.etapa:'');
+  $('notas').value=c.notas; $('call-err').hidden=true;
+  if(!SR){
+    $('call-tip').innerHTML = isIOS && standalone
+      ? 'No iPhone, a transcrição automática não funciona no app da tela de início. Use o <b>microfone do teclado</b> nas anotações, ou abra o link no <b>Safari</b>.'
+      : 'Este navegador não tem transcrição automática. Use o Chrome (Android) ou Safari (iPhone), ou dite pelo microfone do teclado nas anotações.';
+  }
+  show('s-call'); setRunningUI(); renderTx(''); draft();
+  if(!resume) resumeCall();
+}
+function resumeCall(){
+  var c=state.call; if(c.running) return;
+  $('call-err').hidden=true;
+  if(!SR){ $('notas').focus(); return; }
+  c.running=true; c.since=Date.now();
+  Engine.start(); keepAwake(true); setRunningUI(); renderTx(''); draft();
+}
+function pauseCall(){
+  var c=state.call; if(!c || !c.running) { if(c) setRunningUI(); return; }
+  c.acc += Date.now()-c.since; c.running=false;
+  Engine.stop(); keepAwake(false); setRunningUI(); renderTx(''); draft();
+}
+function endCall(){
+  pauseCall();
+  var c=state.call; c.notas=$('notas').value; draft();
+  $('rev-nm').textContent=c.lead_nome; $('rev-lead').textContent=c.lead_nome+' (#'+c.lead_id+')';
+  $('rev-tx').value=c.transcricao; $('rev-notas').value=c.notas; $('rev-err').hidden=true;
+  show('s-review');
+}
+
+/* ---------- envio (com caixa de saída para reenvio) ---------- */
+function payload(c){ return { id:c.id, lead_id:c.lead_id, lead_nome:c.lead_nome, transcricao:c.transcricao, notas:c.notas }; }
+function send(){
+  var c=state.call;
+  c.transcricao=$('rev-tx').value; c.notas=$('rev-notas').value; draft();
+  if(!c.transcricao.trim() && !c.notas.trim()){ var e=$('rev-err'); e.textContent='Escreva algo na transcrição ou nas anotações antes de enviar.'; e.hidden=false; return; }
+  var b=$('btn-send'); b.disabled=true; b.innerHTML='<span class="spin"></span>Enviando…';
+  api('enviar', { ligacao: payload(c) }).then(function(j){
+    LS.del('draft'); state.call=null; state.sel=null; $('bar').classList.remove('on');
+    var w=$('done-warn'); w.hidden=!(j.avisos&&j.avisos.length); w.textContent=(j.avisos||[]).join(' ');
+    show('s-done');
+  }).catch(function(err){
+    var out=LS.get('outbox',[]); if(!out.some(function(x){return x.id===c.id;})) out.push(payload(c)); LS.set('outbox',out);
+    LS.del('draft'); state.call=null; state.sel=null; $('bar').classList.remove('on');
+    $('done-warn').hidden=false; $('done-warn').textContent='Sem conexão com a planilha ('+err.message+'). A ligação ficou guardada neste aparelho e será reenviada automaticamente.';
+    show('s-done');
+  }).finally(function(){ b.disabled=false; b.textContent='Enviar'; });
+}
+function flushOutbox(){
+  var out=LS.get('outbox',[]); if(!out.length) return Promise.resolve();
+  return out.reduce(function(p,item){
+    return p.then(function(){ return api('enviar',{ligacao:item}).then(function(){
+      LS.set('outbox', LS.get('outbox',[]).filter(function(x){return x.id!==item.id;})); toast('Ligação pendente reenviada.');
+    }).catch(function(){}); });
+  }, Promise.resolve());
+}
+
+function loadHist(){
+  var h=$('hist'); h.innerHTML='<div class="empty">Carregando…</div>';
+  var out=LS.get('outbox',[]);
+  api('minhas').then(function(j){
+    var rows=out.map(function(o){ return '<div class="it"><b>'+esc(o.lead_nome)+'</b> <span class="pill st-Erro">Neste aparelho, aguardando envio</span></div>'; });
+    rows=rows.concat((j.itens||[]).map(function(i){
+      var st=String(i.status||''), cls = st.indexOf('Erro')===0?'Erro':st;
+      return '<div class="it"><div style="display:flex;justify-content:space-between;gap:8px"><b>'+esc(i.lead_nome)+'</b><span class="pill st-'+esc(cls)+'">'+esc(st.indexOf('Erro')===0?'Erro':st)+'</span></div>'+
+        '<div style="color:var(--muted);font-size:12px;margin-top:4px">#'+esc(i.lead_id)+' · '+new Date(i.timestamp).toLocaleString('pt-BR')+'</div>'+
+        (i.resultado?'<div style="font-size:13px;margin-top:6px">'+esc(i.resultado)+'</div>':'')+'</div>';
+    }));
+    h.innerHTML = rows.join('') || '<div class="empty">Nenhum envio ainda.</div>';
+  }).catch(function(e){ h.innerHTML='<div class="empty">Não consegui carregar: '+esc(e.message)+'</div>'; });
+}
+
+/* ---------- eventos ---------- */
+$('cfg-save').onclick=saveCfg;
+$('q').addEventListener('input', renderList);
+$('list').addEventListener('click', function(ev){ var b=ev.target.closest('.lead'); if(b) selectLead(b.getAttribute('data-id')); });
+$('btn-start').onclick=function(){ if(state.sel) openCall(false); };
+$('btn-reload').onclick=function(){ loadLeads(false); flushOutbox(); };
+$('btn-pause').onclick=function(){ state.call.running ? pauseCall() : resumeCall(); };
+$('btn-end').onclick=endCall;
+$('notas').addEventListener('input', function(){ if(state.call){ state.call.notas=this.value; draft(); } });
+$('call-back').onclick=function(){
+  if(state.call && (state.call.transcricao || state.call.notas) && !confirm('Sair e descartar esta ligação?')) return;
+  pauseCall(); state.call=null; LS.del('draft'); show('s-list');
+};
+$('rev-back').onclick=function(){ openCall(true); };
+$('btn-send').onclick=send;
+$('btn-discard').onclick=function(){ if(confirm('Descartar esta ligação? O texto será apagado.')){ state.call=null; LS.del('draft'); show('s-list'); renderList(); } };
+$('btn-new').onclick=function(){ $('q').value=''; show('s-list'); renderList(); loadLeads(true); };
+$('btn-hist').onclick=function(){ show('s-hist'); loadHist(); };
+$('hist-back').onclick=function(){ show('s-list'); };
+$('btn-reset').onclick=function(){ if(confirm('Apagar a configuração deste aparelho?')){ LS.del('cfg'); boot(); } };
+window.addEventListener('online', flushOutbox);
+document.addEventListener('visibilitychange', function(){
+  // ao voltar para o app (ex.: depois de atender/desligar), retoma a transcrição se ela estava ligada
+  if(document.visibilityState==='visible' && state.call && state.call.running && !Engine.want){ Engine.start(); }
+});
+
+/* ---------- início ---------- */
+function boot(){
+  readHash();
+  if(!cfg()){ show('s-config'); return; }
+  var d=LS.get('draft',null);
+  if(d){ state.call=d; d.running=false; state.sel={lead_id:d.lead_id}; toast('Rascunho recuperado.'); endCall(); return; }
+  show('s-list'); renderList(); loadLeads(state.leads.length>0); flushOutbox();
+  api('ping').then(function(j){ if(j.vendedor) $('who').textContent=j.vendedor; }).catch(function(){});
+}
+if('serviceWorker' in navigator && location.protocol==='https:') navigator.serviceWorker.register('sw.js').catch(function(){});
+window.__ata = { state: state, Engine: Engine };
+boot();
+})();
+</script>
+</body>
+</html>
