@@ -947,21 +947,36 @@ function onFilePicked(file){
 }
 /* Microfone: getUserMedia é chamado direto no toque (sem await antes), como o iOS exige. */
 function micDisponivel(){ return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder); }
+/* Navegador atual, para dar o caminho certo de permissão do microfone. */
+var NAV = inApp ? 'inapp' : /CriOS/.test(UA) ? 'chrome-ios' : /FxiOS/.test(UA) ? 'firefox-ios' : /EdgiOS/.test(UA) ? 'edge-ios'
+  : isIOS ? 'safari-ios' : /Android/.test(UA) && /SamsungBrowser/.test(UA) ? 'samsung' : /Android/.test(UA) && /Firefox/.test(UA) ? 'firefox-android'
+  : /Android/.test(UA) && /EdgA/.test(UA) ? 'edge-android' : /Android/.test(UA) ? 'chrome-android' : 'desktop';
+var ANEXAR = ' Enquanto isso, use "Anexar áudio" com um áudio do gravador ou do WhatsApp.';
+function comoPermitirMic(){
+  switch(NAV){
+    case 'chrome-ios': return 'No Chrome do iPhone: 1) Ajustes do iPhone > Chrome > Microfone (ativar). 2) No Chrome, toque no cadeado ao lado do endereço > Microfone > Permitir; ou feche a aba, abra o link de novo e toque em gravar para o Chrome perguntar outra vez. Se não der, abra o link no Safari.';
+    case 'firefox-ios': return 'No Firefox do iPhone: Ajustes do iPhone > Firefox > Microfone (ativar). Depois feche a aba, abra o link de novo e toque em gravar. Se não der, abra o link no Safari.';
+    case 'edge-ios': return 'No Edge do iPhone: Ajustes do iPhone > Edge > Microfone (ativar). Depois feche a aba, abra o link de novo e toque em gravar. Se não der, abra o link no Safari.';
+    case 'safari-ios': return 'No Safari: toque em "aA" na barra de endereço > Ajustes do Site > Microfone > Permitir. Ou Ajustes do iPhone > Apps > Safari > Microfone > "Perguntar" ou "Permitir". Depois toque de novo para gravar.';
+    case 'inapp': return 'Dentro do '+inAppName+' o microfone não é liberado: '+(isIOS?'toque em ⋯ > Abrir no Safari (ou "Abrir no Safari" no aviso amarelo)':'toque em ⋮ > Abrir no Chrome')+' e grave por lá.';
+    case 'samsung': return 'No Samsung Internet: menu ≡ > Configurações > Sites e downloads > Permissões do site > Microfone > permitir este site. Ou Configurações do Android > Apps > Samsung Internet > Permissões > Microfone.';
+    case 'firefox-android': return 'No Firefox: toque no cadeado ao lado do endereço > Microfone > Permitir. Ou Configurações do Android > Apps > Firefox > Permissões > Microfone.';
+    case 'edge-android': case 'chrome-android': return 'No Chrome: toque no cadeado ao lado do endereço > Permissões > Microfone > Permitir. Se não aparecer, Configurações do Android > Apps > Chrome > Permissões > Microfone > Permitir. Depois toque de novo para gravar.';
+    default: return 'Toque no cadeado ao lado do endereço > Microfone > Permitir e tente de novo.';
+  }
+}
 function msgSemMic(){
-  return inApp
-    ? 'O navegador dentro do '+inAppName+' não libera o microfone. Toque em "Abrir no Safari" (ou ⋯ > Abrir no navegador) e grave por lá. Enquanto isso, use "Anexar áudio" com um áudio do gravador ou do WhatsApp.'
-    : 'Este navegador não grava áudio. '+(isIOS?'Abra no Safari com o iOS atualizado':'Use o Chrome atualizado')+', ou use "Anexar áudio" com um áudio do gravador ou do WhatsApp.';
+  if(inApp) return 'O navegador dentro do '+inAppName+' não libera o microfone. '+(isIOS?'Toque em "Abrir no Safari" (ou ⋯ > Abrir no Safari)':'Toque em ⋮ > Abrir no Chrome')+' e grave por lá.'+ANEXAR;
+  return 'Este navegador não grava áudio. '+(isIOS?'Atualize o iOS e use o Safari ou o Chrome':'Use o Chrome atualizado')+'.'+ANEXAR;
 }
 function msgErroMic(e){
   var n = e && e.name;
   if(n==='NotAllowedError' || n==='SecurityError' || n==='PermissionDeniedError')
-    return isIOS
-      ? 'Permissão do microfone negada. No iPhone: Ajustes > Safari > Microfone > "Perguntar" ou "Permitir". Ou, no Safari, toque em "aA" na barra de endereço > Ajustes do Site > Microfone > Permitir. Depois toque de novo para gravar.'+(inApp?' Dentro do '+inAppName+' isso não funciona: abra no Safari.':'')
-      : 'Permissão do microfone negada. Toque no cadeado da barra de endereço > Permissões > Microfone > Permitir e tente de novo.';
-  if(n==='NotFoundError' || n==='OverconstrainedError') return 'Nenhum microfone encontrado neste aparelho.';
+    return 'Permissão do microfone negada. '+comoPermitirMic()+ANEXAR;
+  if(n==='NotFoundError' || n==='OverconstrainedError') return 'Nenhum microfone encontrado neste aparelho.'+ANEXAR;
   if(n==='NotReadableError' || n==='AbortError' || n==='TrackStartError') return 'O microfone está ocupado (outro app ou uma ligação em andamento). Feche o outro app ou espere a ligação terminar e tente de novo.';
-  if(n==='Timeout') return 'O navegador não respondeu ao pedido do microfone.'+(inApp?' Isso é comum dentro do '+inAppName+': abra no Safari.':' Recarregue a página e tente de novo.');
-  return 'Não consegui abrir o microfone ('+((e&&e.message)||n||e)+').';
+  if(n==='Timeout') return 'O navegador não respondeu ao pedido do microfone.'+(inApp?' Isso é comum dentro do '+inAppName+': '+(isIOS?'abra no Safari.':'abra no Chrome.'):' Feche a aba, abra o link de novo e tente.')+ANEXAR;
+  return 'Não consegui abrir o microfone ('+((e&&e.message)||n||e)+').'+ANEXAR;
 }
 /** Abre o microfone e começa a gravar. cb.ok(g) com o gravador; cb.erro(msg); cb.interrompido(motivo) se o sistema cortar o microfone. */
 function micGravar(cb){
@@ -1178,7 +1193,7 @@ function boot(){
   api('ping').then(function(j){ if(j.vendedor) $('who').textContent=j.vendedor; state.srv={ versao:j.versao||1, audio_na_ligacao:!!j.audio_na_ligacao }; LS.set('srv', state.srv); }).catch(function(){});
 }
 if('serviceWorker' in navigator && location.protocol==='https:') navigator.serviceWorker.register('sw.js').catch(function(){});
-window.__ata = { state: state, Engine: Engine, AudioBox: AudioBox, pickRecMime: pickRecMime };
+window.__ata = { NAV: NAV, state: state, Engine: Engine, AudioBox: AudioBox, pickRecMime: pickRecMime };
 boot();
 })();
 </script>
