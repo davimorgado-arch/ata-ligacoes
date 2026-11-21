@@ -40,7 +40,7 @@ header.top .sub{font-size:12px;opacity:.8;font-weight:500;display:block}
 .search svg{width:20px;height:20px;color:var(--muted)}
 .meta{display:flex;justify-content:space-between;align-items:center;padding:12px 18px 4px;color:var(--muted);font-size:13px}
 .meta button{background:none;color:var(--brand);font-weight:600;font-size:13px;padding:6px 0}
-.list{padding:6px 14px calc(120px + var(--safe-bot));display:flex;flex-direction:column;gap:10px}
+.list{padding:6px 14px calc(190px + var(--safe-bot));display:flex;flex-direction:column;gap:10px}
 .lead{background:var(--card);border-radius:var(--radius);padding:14px 16px;border:2px solid transparent;
   box-shadow:0 1px 3px rgba(16,40,38,.06);text-align:left;width:100%;color:var(--text)}
 .lead.sel{border-color:var(--brand);background:var(--brand-soft)}
@@ -103,6 +103,26 @@ input.f{width:100%;height:48px;border:1px solid var(--line);border-radius:12px;p
 .st-Lançada{background:#e3f4ea;color:var(--ok)} .st-Pendente{background:#fff4d6;color:#7a5600} .st-Erro{background:#fde8e8;color:var(--danger)}
 .spin{width:22px;height:22px;border:3px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:sp 0.8s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
+.bar .row2{margin-top:10px}
+.bar .row2 .btn{height:48px;font-size:15px}
+.seg{display:flex;gap:8px}
+.seg button{flex:1;height:48px;border-radius:12px;background:#eef2f1;color:var(--text);font-weight:700;font-size:15px;border:2px solid transparent}
+.seg button.on{background:var(--brand-soft);border-color:var(--brand);color:var(--brand)}
+.two{display:flex;gap:10px}.two>div{flex:1;min-width:0}
+.two label.f{margin-top:0}
+@media (max-width:560px){.two{flex-direction:column;gap:12px}}
+audio{margin-top:0}
+input.f[type=datetime-local]{padding:0 8px;font-size:15px;-webkit-appearance:none;appearance:none;min-width:0}
+.rec{display:flex;flex-direction:column;align-items:center;gap:12px;padding:8px 0}
+.recbtn{width:96px;height:96px;border-radius:50%;background:var(--danger);color:#fff;display:grid;place-items:center;box-shadow:0 6px 18px rgba(198,40,40,.35)}
+.recbtn svg{width:40px;height:40px}
+.recbtn.on{background:#13201f;box-shadow:0 0 0 0 rgba(255,90,90,.7);animation:pulse 1.4s infinite}
+.rec .timer{margin:0;font-size:34px;color:var(--text)}
+.filebox{display:flex;align-items:center;gap:12px}
+.filebox .nm{font-weight:700;word-break:break-all}
+.filebox .sub{color:var(--muted);font-size:13px}
+audio{width:100%}
+.tag{font-size:11px;font-weight:700;color:var(--muted);margin-left:6px}
 </style>
 </head>
 <body>
@@ -141,6 +161,46 @@ input.f{width:100%;height:48px;border:1px solid var(--line);border-radius:12px;p
   <div class="bar" id="bar">
     <div class="who">Lead escolhido: <b id="bar-nm">—</b></div>
     <button class="btn" id="btn-start"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.9V21h2v-2.1A7 7 0 0 0 19 12h-2Z"/></svg>Iniciar ligação</button>
+    <div class="row2">
+      <button class="btn ghost" id="btn-rec"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="6"/></svg>Gravar áudio</button>
+      <button class="btn ghost" id="btn-attach"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 11-8.5 8.5a5 5 0 0 1-7-7L14 4a3.5 3.5 0 0 1 5 5l-8.5 8.5a2 2 0 0 1-3-3L15 7"/></svg>Anexar áudio</button>
+    </div>
+    <input type="file" id="file-audio" accept="audio/*,.opus,.ogg,.oga,.m4a,.mp3,.aac,.wav,.webm,.amr,.3gp,.mp4" hidden>
+  </div>
+</section>
+
+<!-- ===================== ÁUDIO (anexar ou gravar) ===================== -->
+<section class="screen" id="s-audio">
+  <header class="top"><button class="iconbtn" id="au-back" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg></button><h1 id="au-title">Áudio<span class="sub" id="au-nm">—</span></h1></header>
+  <div class="body">
+    <div class="card" id="au-rec-card" hidden>
+      <h3>Gravação</h3>
+      <div class="rec">
+        <button class="recbtn" id="au-recbtn" aria-label="Gravar"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="7"/></svg></button>
+        <div class="timer" id="au-timer">00:00</div>
+        <div class="stxt" id="au-rstat" style="color:var(--muted)">Toque para gravar</div>
+      </div>
+    </div>
+    <div class="card" id="au-file-card" hidden>
+      <h3>Arquivo</h3>
+      <div class="filebox"><div style="flex:1;min-width:0"><div class="nm" id="au-fnm">—</div><div class="sub" id="au-finfo"></div></div>
+        <button class="btn ghost" id="au-change" style="width:auto;height:40px;padding:0 14px;font-size:14px">Trocar</button></div>
+    </div>
+    <audio id="au-player" controls preload="metadata" hidden></audio>
+    <div class="card"><h3>Tipo de atividade no Lupe</h3>
+      <div class="seg" id="au-tipo"><button data-v="Chamada">Chamada</button><button data-v="E-mail">E-mail</button></div>
+    </div>
+    <div class="card"><h3>Horário</h3>
+      <div class="two"><div><label class="f" for="au-ini">Início</label><input class="f" type="datetime-local" id="au-ini"></div>
+        <div><label class="f" for="au-fim">Fim</label><input class="f" type="datetime-local" id="au-fim"></div></div>
+    </div>
+    <div class="card"><h3>Anotações (opcional)</h3><textarea id="au-notas" placeholder="Ex.: decisor é o Carlos, retornar quinta…"></textarea></div>
+    <div class="note" id="au-tip">O bot transcreve o áudio, escreve o resumo e lança no Lupe com o tipo, o horário e a conclusão.</div>
+    <div class="note err" id="au-err" hidden></div>
+  </div>
+  <div class="foot">
+    <button class="btn" id="au-send">Enviar</button>
+    <button class="btn ghost" id="au-discard">Descartar</button>
   </div>
 </section>
 
@@ -172,7 +232,11 @@ input.f{width:100%;height:48px;border:1px solid var(--line);border-radius:12px;p
   <div class="body">
     <div class="card"><h3>Transcrição (pode editar)</h3><textarea class="big" id="rev-tx"></textarea></div>
     <div class="card"><h3>Anotações</h3><textarea id="rev-notas"></textarea></div>
-    <div class="note">O bot escreve a ata a partir deste texto e lança no Lupe em até 30 min. Confira o lead: <b id="rev-lead"></b></div>
+    <div class="card"><h3>Horário da ligação</h3>
+      <div class="two"><div><label class="f" for="rev-ini">Início</label><input class="f" type="datetime-local" id="rev-ini"></div>
+        <div><label class="f" for="rev-fim">Fim</label><input class="f" type="datetime-local" id="rev-fim"></div></div>
+    </div>
+    <div class="note">Vai para o Lupe como <b>Ligacao</b>. O bot escreve a ata a partir deste texto e lança no Lupe em até 30 min. Confira o lead: <b id="rev-lead"></b></div>
     <div class="note err" id="rev-err" hidden></div>
   </div>
   <div class="foot">
@@ -210,7 +274,7 @@ var LS = {
   del: function(k){ try{ localStorage.removeItem('ata.'+k); }catch(e){} }
 };
 var $ = function(id){ return document.getElementById(id); };
-var state = { leads: LS.get('leads', []), sel: null, call: null };
+var state = { leads: LS.get('leads', []), sel: null, call: null, audio: null };
 
 /* ---------- utilidades ---------- */
 function show(id){ document.querySelectorAll('.screen').forEach(function(s){ s.classList.toggle('on', s.id===id); }); window.scrollTo(0,0); }
@@ -223,6 +287,10 @@ function fmtCnpj(s){ var d=digits(s); return d.length===14 ? d.replace(/^(\d{2})
 function uid(){ return 'L' + Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
 function mmss(ms){ var s=Math.floor(ms/1000); return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); }
 function stamp(ms){ return '['+mmss(ms)+'] '; }
+function pad(n){ return String(n).padStart(2,'0'); }
+function toLocalInput(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes()); }
+function fromLocalInput(v){ return v ? String(v).replace('T',' ').slice(0,16) : ''; }
+function mb(n){ return (n/1048576).toFixed(n<10485760?1:0).replace('.',',')+' MB'; }
 
 /* ---------- API (planilha do vendedor via Apps Script) ---------- */
 function cfg(){ return LS.get('cfg', null); }
@@ -377,7 +445,7 @@ function setRunningUI(){
 }
 function openCall(resume){
   var l=state.sel;
-  if(!resume) state.call = { id:uid(), lead_id:l.lead_id, lead_nome:(l.empresa||l.razao_social||''), cnpj:l.cnpj||'', etapa:l.etapa||'', transcricao:'', notas:'', acc:0, since:0, running:false };
+  if(!resume) state.call = { id:uid(), lead_id:l.lead_id, lead_nome:(l.empresa||l.razao_social||''), cnpj:l.cnpj||'', etapa:l.etapa||'', transcricao:'', notas:'', acc:0, since:0, running:false, startedAt:Date.now(), endedAt:0 };
   var c=state.call;
   $('call-nm').textContent=c.lead_nome;
   $('call-info').textContent='#'+c.lead_id + (c.cnpj?' · '+fmtCnpj(c.cnpj):'') + (c.etapa?' · '+c.etapa:'');
@@ -404,18 +472,21 @@ function pauseCall(){
 }
 function endCall(){
   pauseCall();
-  var c=state.call; c.notas=$('notas').value; draft();
+  var c=state.call; c.notas=$('notas').value; c.endedAt=Date.now(); draft();
+  $('rev-ini').value=c.startedAt?toLocalInput(new Date(c.startedAt)):''; $('rev-fim').value=toLocalInput(new Date(c.endedAt));
   $('rev-nm').textContent=c.lead_nome; $('rev-lead').textContent=c.lead_nome+' (#'+c.lead_id+')';
   $('rev-tx').value=c.transcricao; $('rev-notas').value=c.notas; $('rev-err').hidden=true;
   show('s-review');
 }
 
 /* ---------- envio (com caixa de saída para reenvio) ---------- */
-function payload(c){ return { id:c.id, lead_id:c.lead_id, lead_nome:c.lead_nome, transcricao:c.transcricao, notas:c.notas }; }
+function payload(c){ return { id:c.id, lead_id:c.lead_id, lead_nome:c.lead_nome, transcricao:c.transcricao, notas:c.notas,
+  origem:'ligacao', tipo:'Ligacao', hora_inicio:fromLocalInput(c.horaIni), hora_fim:fromLocalInput(c.horaFim) }; }
 function send(){
   var c=state.call;
-  c.transcricao=$('rev-tx').value; c.notas=$('rev-notas').value; draft();
+  c.transcricao=$('rev-tx').value; c.notas=$('rev-notas').value; c.horaIni=$('rev-ini').value; c.horaFim=$('rev-fim').value; draft();
   if(!c.transcricao.trim() && !c.notas.trim()){ var e=$('rev-err'); e.textContent='Escreva algo na transcrição ou nas anotações antes de enviar.'; e.hidden=false; return; }
+  if(c.horaIni && c.horaFim && c.horaFim<c.horaIni){ var e2=$('rev-err'); e2.textContent='A hora final está antes da inicial.'; e2.hidden=false; return; }
   var b=$('btn-send'); b.disabled=true; b.innerHTML='<span class="spin"></span>Enviando…';
   api('enviar', { ligacao: payload(c) }).then(function(j){
     LS.del('draft'); state.call=null; state.sel=null; $('bar').classList.remove('on');
@@ -429,27 +500,215 @@ function send(){
   }).finally(function(){ b.disabled=false; b.textContent='Enviar'; });
 }
 function flushOutbox(){
-  var out=LS.get('outbox',[]); if(!out.length) return Promise.resolve();
+  var out=LS.get('outbox',[]);
   return out.reduce(function(p,item){
     return p.then(function(){ return api('enviar',{ligacao:item}).then(function(){
       LS.set('outbox', LS.get('outbox',[]).filter(function(x){return x.id!==item.id;})); toast('Ligação pendente reenviada.');
     }).catch(function(){}); });
-  }, Promise.resolve());
+  }, Promise.resolve()).then(flushAudioBox);
 }
 
 function loadHist(){
   var h=$('hist'); h.innerHTML='<div class="empty">Carregando…</div>';
   var out=LS.get('outbox',[]);
-  api('minhas').then(function(j){
+  Promise.all([api('minhas'), AudioBox.all().catch(function(){ return []; })]).then(function(res){
+    var j=res[0]; out=out.concat(res[1].map(function(x){ return x.meta; }));
     var rows=out.map(function(o){ return '<div class="it"><b>'+esc(o.lead_nome)+'</b> <span class="pill st-Erro">Neste aparelho, aguardando envio</span></div>'; });
     rows=rows.concat((j.itens||[]).map(function(i){
       var st=String(i.status||''), cls = st.indexOf('Erro')===0?'Erro':st;
-      return '<div class="it"><div style="display:flex;justify-content:space-between;gap:8px"><b>'+esc(i.lead_nome)+'</b><span class="pill st-'+esc(cls)+'">'+esc(st.indexOf('Erro')===0?'Erro':st)+'</span></div>'+
+      var tag = i.origem==='audio_gravado'?'áudio gravado':i.origem==='audio_anexo'?'áudio anexado':'ligação';
+      return '<div class="it"><div style="display:flex;justify-content:space-between;gap:8px"><b>'+esc(i.lead_nome)+'<span class="tag">'+esc((i.tipo||'Ligacao')+' · '+tag)+'</span></b><span class="pill st-'+esc(cls)+'">'+esc(st.indexOf('Erro')===0?'Erro':st)+'</span></div>'+
         '<div style="color:var(--muted);font-size:12px;margin-top:4px">#'+esc(i.lead_id)+' · '+new Date(i.timestamp).toLocaleString('pt-BR')+'</div>'+
+        (i.conclusao?'<div style="font-size:13px;margin-top:6px"><b>Conclusão:</b> '+esc(i.conclusao)+'</div>':'')+
         (i.resultado?'<div style="font-size:13px;margin-top:6px">'+esc(i.resultado)+'</div>':'')+'</div>';
     }));
     h.innerHTML = rows.join('') || '<div class="empty">Nenhum envio ainda.</div>';
   }).catch(function(e){ h.innerHTML='<div class="empty">Não consegui carregar: '+esc(e.message)+'</div>'; });
+}
+
+/* ---------- áudio: anexar arquivo ou gravar (o bot transcreve depois) ---------- */
+var AUDIO_AVISO = 25*1048576, AUDIO_MAX = 35*1048576;
+// Caixa de saída dos áudios no IndexedDB (o localStorage não comporta arquivos).
+var AudioBox = {
+  _db:null,
+  open:function(){
+    var self=this;
+    if(self._db) return Promise.resolve(self._db);
+    return new Promise(function(ok,ko){
+      if(!window.indexedDB) return ko(new Error('sem IndexedDB'));
+      var r=indexedDB.open('ata-audios',1);
+      r.onupgradeneeded=function(){ r.result.createObjectStore('fila',{keyPath:'id'}); };
+      r.onsuccess=function(){ self._db=r.result; ok(r.result); };
+      r.onerror=function(){ ko(r.error||new Error('IndexedDB')); };
+    });
+  },
+  _tx:function(mode, fn){
+    return this.open().then(function(db){ return new Promise(function(ok,ko){
+      var t=db.transaction('fila',mode), st=t.objectStore('fila'), out=fn(st);
+      t.oncomplete=function(){ ok(out && out.result!==undefined ? out.result : undefined); };
+      t.onerror=function(){ ko(t.error); }; t.onabort=function(){ ko(t.error||new Error('abort')); };
+    }); });
+  },
+  put:function(item){ return this._tx('readwrite', function(st){ st.put(item); }); },
+  del:function(id){ return this._tx('readwrite', function(st){ st.delete(id); }); },
+  all:function(){ return this._tx('readonly', function(st){ return st.getAll(); }); }
+};
+function blobToBase64(blob){
+  return new Promise(function(ok,ko){
+    var fr=new FileReader();
+    fr.onload=function(){ var s=String(fr.result||''); ok(s.slice(s.indexOf(',')+1)); };
+    fr.onerror=function(){ ko(fr.error||new Error('Não consegui ler o áudio.')); };
+    fr.readAsDataURL(blob);
+  });
+}
+function extDe(nome){ var m=String(nome||'').match(/\.([a-z0-9]{2,5})$/i); return m?m[1].toLowerCase():''; }
+function mimeDe(file){
+  if(file.type && file.type!=='application/octet-stream') return file.type;
+  var e=extDe(file.name);
+  return ({opus:'audio/ogg',ogg:'audio/ogg',oga:'audio/ogg',m4a:'audio/mp4',mp4:'audio/mp4',aac:'audio/aac',mp3:'audio/mpeg',wav:'audio/wav',webm:'audio/webm',amr:'audio/amr','3gp':'audio/3gpp'})[e] || 'application/octet-stream';
+}
+function pickRecMime(){
+  if(!window.MediaRecorder || !MediaRecorder.isTypeSupported) return '';
+  var opts=['audio/webm;codecs=opus','audio/mp4;codecs=mp4a.40.2','audio/mp4','audio/webm','audio/ogg;codecs=opus','audio/aac'];
+  for(var i=0;i<opts.length;i++){ try{ if(MediaRecorder.isTypeSupported(opts[i])) return opts[i]; }catch(e){} }
+  return '';
+}
+function extDoMime(m){ m=String(m||''); return m.indexOf('webm')!==-1?'webm':m.indexOf('ogg')!==-1?'ogg':(m.indexOf('mp4')!==-1||m.indexOf('aac')!==-1)?'m4a':'audio'; }
+
+var Rec = { mr:null, stream:null, chunks:[], t0:0, tick:null };
+function auErr(msg){ var e=$('au-err'); e.textContent=msg||''; e.hidden=!msg; }
+function openAudio(modo){
+  var l=state.sel; if(!l) return;
+  state.audio = { id:uid(), modo:modo, lead_id:l.lead_id, lead_nome:(l.empresa||l.razao_social||''), tipo:'', blob:null, nome:'', mime:'', dur:0 };
+  $('au-title').firstChild.nodeValue = modo==='gravado' ? 'Gravar áudio' : 'Anexar áudio';
+  $('au-nm').textContent = state.audio.lead_nome+'  #'+l.lead_id;
+  $('au-rec-card').hidden = modo!=='gravado'; $('au-file-card').hidden = modo!=='anexo';
+  $('au-player').hidden=true; $('au-player').removeAttribute('src');
+  $('au-fnm').textContent='Nenhum arquivo escolhido'; $('au-finfo').textContent='Toque em Trocar para escolher (WhatsApp, gravador, arquivos).';
+  $('au-notas').value=''; $('au-ini').value=''; $('au-fim').value=''; auErr('');
+  document.querySelectorAll('#au-tipo button').forEach(function(b){ b.classList.remove('on'); });
+  $('au-timer').textContent='00:00'; $('au-rstat').textContent='Toque para gravar'; $('au-recbtn').classList.remove('on');
+  if(modo==='gravado' && (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder)){
+    auErr('Este navegador não grava áudio. Atualize o iPhone/Android ou use "Anexar áudio" com um áudio gravado no gravador do celular.');
+  }
+  show('s-audio');
+}
+function setAudioBlob(blob, nome, mime){
+  var a=state.audio; a.blob=blob; a.nome=nome; a.mime=mime;
+  var p=$('au-player'); try{ if(p.src) URL.revokeObjectURL(p.src); }catch(e){}
+  p.src=URL.createObjectURL(blob); p.hidden=false;
+}
+function durDe(blob){
+  return new Promise(function(ok){
+    var el=document.createElement('audio'), done=false, url=URL.createObjectURL(blob);
+    function fim(v){ if(done) return; done=true; try{ URL.revokeObjectURL(url); }catch(e){} ok(v); }
+    el.preload='metadata';
+    el.onloadedmetadata=function(){ var d=el.duration; fim(isFinite(d)&&d>0 ? d : 0); };
+    el.onerror=function(){ fim(0); };
+    setTimeout(function(){ fim(0); }, 4000);
+    el.src=url;
+  });
+}
+function onFilePicked(file){
+  if(!file) return;
+  if(!state.audio || state.audio.modo!=='anexo') openAudio('anexo');
+  auErr('');
+  if(file.size > AUDIO_MAX){ auErr('Arquivo de '+mb(file.size)+': o limite é '+mb(AUDIO_MAX)+'. Corte o áudio ou mande em partes.'); return; }
+  var mime=mimeDe(file);
+  if(!/^audio\/|^video\/(mp4|webm|3gpp)/.test(mime) && !extDe(file.name)){ auErr('Esse arquivo não parece ser áudio.'); return; }
+  setAudioBlob(file, file.name||('audio.'+extDoMime(mime)), mime);
+  $('au-fnm').textContent=file.name||'áudio';
+  $('au-finfo').textContent=mb(file.size)+' · lendo duração…';
+  durDe(file).then(function(d){
+    var a=state.audio; if(!a || a.blob!==file) return;
+    a.dur=d; var agora=new Date();
+    $('au-fim').value=toLocalInput(agora);
+    $('au-ini').value=toLocalInput(d ? new Date(agora.getTime()-d*1000) : agora);
+    $('au-finfo').textContent=mb(file.size)+(d?' · '+mmss(d*1000):' · duração desconhecida (confira o horário)');
+    if(file.size > AUDIO_AVISO) auErr('Áudio grande ('+mb(file.size)+'): o envio pode demorar. Prefira Wi-Fi.');
+  });
+}
+function recStart(){
+  auErr('');
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder){ auErr('Este navegador não grava áudio. Use "Anexar áudio".'); return; }
+  var mime=pickRecMime();
+  navigator.mediaDevices.getUserMedia({ audio:{ echoCancellation:true, noiseSuppression:true } }).then(function(stream){
+    Rec.stream=stream; Rec.chunks=[];
+    var o={ audioBitsPerSecond:32000 }; if(mime) o.mimeType=mime;
+    var mr; try{ mr=new MediaRecorder(stream, o); }catch(e){ mr=new MediaRecorder(stream); }
+    Rec.mr=mr;
+    mr.ondataavailable=function(ev){ if(ev.data && ev.data.size) Rec.chunks.push(ev.data); };
+    mr.onstop=function(){
+      var type=mr.mimeType||mime||'audio/webm', blob=new Blob(Rec.chunks,{type:type}), fimT=new Date();
+      stopTracks();
+      if(!state.audio) return;
+      setAudioBlob(blob, 'gravacao.'+extDoMime(type), type);
+      state.audio.dur=(fimT.getTime()-Rec.t0)/1000;
+      $('au-ini').value=toLocalInput(new Date(Rec.t0)); $('au-fim').value=toLocalInput(fimT);
+      $('au-rstat').textContent='Gravado ('+mb(blob.size)+'). Ouça abaixo ou grave de novo.';
+      if(blob.size > AUDIO_MAX) auErr('Gravação de '+mb(blob.size)+': passa do limite de '+mb(AUDIO_MAX)+'.');
+      else if(blob.size > AUDIO_AVISO) auErr('Gravação grande ('+mb(blob.size)+'): o envio pode demorar. Prefira Wi-Fi.');
+    };
+    mr.onerror=function(ev){ auErr('A gravação falhou: '+((ev.error&&ev.error.message)||'erro')); recStop(); };
+    Rec.t0=Date.now(); mr.start(1000);
+    $('au-recbtn').classList.add('on'); $('au-rstat').textContent='Gravando… toque para parar';
+    $('au-player').hidden=true; keepAwake(true);
+    clearInterval(Rec.tick); Rec.tick=setInterval(function(){ $('au-timer').textContent=mmss(Date.now()-Rec.t0); }, 500);
+  }).catch(function(e){
+    auErr(e && e.name==='NotAllowedError' ? 'Sem permissão de microfone. Libere o microfone para este site nas configurações do navegador.'
+      : 'Não consegui abrir o microfone ('+((e&&e.message)||e)+'). Se o celular está em ligação, o microfone fica com a ligação.');
+  });
+}
+function stopTracks(){ if(Rec.stream){ Rec.stream.getTracks().forEach(function(t){ try{ t.stop(); }catch(e){} }); Rec.stream=null; } }
+function recStop(){
+  clearInterval(Rec.tick); keepAwake(false); $('au-recbtn').classList.remove('on');
+  if(Rec.mr && Rec.mr.state!=='inactive'){ try{ Rec.mr.stop(); }catch(e){ stopTracks(); } } else stopTracks();
+  Rec.mr=null;
+}
+function recording(){ return !!(Rec.mr && Rec.mr.state==='recording'); }
+function audioMeta(a){
+  return { id:a.id, lead_id:a.lead_id, lead_nome:a.lead_nome, origem:a.modo==='gravado'?'audio_gravado':'audio_anexo', tipo:a.tipo,
+    hora_inicio:fromLocalInput($('au-ini').value), hora_fim:fromLocalInput($('au-fim').value), notas:$('au-notas').value, transcricao:'' };
+}
+function sendAudioItem(meta, blob, nome, mime){
+  return blobToBase64(blob).then(function(b64){
+    return api('enviar', { ligacao: Object.assign({}, meta, { audio:{ base64:b64, mime:mime, nome:nome, tamanho:blob.size } }) });
+  });
+}
+function leaveAudio(){ state.audio=null; state.sel=null; $('bar').classList.remove('on'); var p=$('au-player'); try{ if(p.src) URL.revokeObjectURL(p.src); }catch(e){} p.removeAttribute('src'); }
+function sendAudio(){
+  var a=state.audio; if(!a) return;
+  if(recording()){ auErr('Pare a gravação antes de enviar.'); return; }
+  if(!a.blob){ auErr(a.modo==='gravado'?'Grave o áudio antes de enviar.':'Escolha o arquivo de áudio.'); return; }
+  if(a.blob.size > AUDIO_MAX){ auErr('Áudio acima de '+mb(AUDIO_MAX)+'.'); return; }
+  if(!a.tipo){ auErr('Escolha o tipo: Chamada ou E-mail.'); return; }
+  var meta=audioMeta(a);
+  if(!meta.hora_inicio || !meta.hora_fim){ auErr('Preencha a hora inicial e a final.'); return; }
+  if(meta.hora_fim < meta.hora_inicio){ auErr('A hora final está antes da inicial.'); return; }
+  if(a.blob.size > AUDIO_AVISO && !confirm('Áudio de '+mb(a.blob.size)+'. O envio pode demorar e gastar dados. Enviar agora?')) return;
+  auErr('');
+  var b=$('au-send'); b.disabled=true; b.innerHTML='<span class="spin"></span>Enviando '+mb(a.blob.size)+'…';
+  sendAudioItem(meta, a.blob, a.nome, a.mime).then(function(j){
+    leaveAudio();
+    var w=$('done-warn'); w.hidden=!(j.avisos&&j.avisos.length); w.textContent=(j.avisos||[]).join(' ');
+    $('done-txt').textContent='O bot transcreve o áudio e lança no Lupe em até 30 min.';
+    show('s-done');
+  }).catch(function(err){
+    // erro do servidor (ex.: tipo inválido) não adianta reenviar: mostra e deixa corrigir
+    if(!/Failed to fetch|NetworkError|Load failed|Servidor respondeu|network/i.test(err.message)){ auErr('Não foi enviado: '+err.message); return; }
+    return AudioBox.put({ id:meta.id, meta:meta, blob:a.blob, nome:a.nome, mime:a.mime }).then(function(){
+      leaveAudio();
+      $('done-warn').hidden=false; $('done-warn').textContent='Sem conexão com a planilha ('+err.message+'). O áudio ficou guardado neste aparelho e será reenviado automaticamente.';
+      show('s-done');
+    }).catch(function(){ auErr('Sem conexão ('+err.message+') e não consegui guardar o áudio no aparelho. Não feche esta tela e toque em Enviar de novo.'); });
+  }).finally(function(){ b.disabled=false; b.textContent='Enviar'; });
+}
+function flushAudioBox(){
+  return AudioBox.all().then(function(itens){
+    return (itens||[]).reduce(function(p,it){
+      return p.then(function(){ return sendAudioItem(it.meta, it.blob, it.nome, it.mime).then(function(){ return AudioBox.del(it.id).then(function(){ toast('Áudio pendente reenviado.'); }); }).catch(function(){}); });
+    }, Promise.resolve());
+  }).catch(function(){});
 }
 
 /* ---------- eventos ---------- */
@@ -457,6 +716,16 @@ $('cfg-save').onclick=saveCfg;
 $('q').addEventListener('input', renderList);
 $('list').addEventListener('click', function(ev){ var b=ev.target.closest('.lead'); if(b) selectLead(b.getAttribute('data-id')); });
 $('btn-start').onclick=function(){ if(state.sel) openCall(false); };
+$('btn-rec').onclick=function(){ if(state.sel) openAudio('gravado'); };
+$('btn-attach').onclick=function(){ if(!state.sel) return; openAudio('anexo'); $('file-audio').value=''; $('file-audio').click(); };
+$('au-change').onclick=function(){ $('file-audio').value=''; $('file-audio').click(); };
+$('file-audio').addEventListener('change', function(){ onFilePicked(this.files && this.files[0]); });
+$('au-recbtn').onclick=function(){ recording() ? recStop() : recStart(); };
+$('au-tipo').addEventListener('click', function(ev){ var b=ev.target.closest('button'); if(!b||!state.audio) return; state.audio.tipo=b.getAttribute('data-v');
+  document.querySelectorAll('#au-tipo button').forEach(function(x){ x.classList.toggle('on', x===b); }); });
+$('au-send').onclick=sendAudio;
+function auSair(){ if((recording() || (state.audio&&state.audio.blob)) && !confirm('Descartar este áudio?')) return; recStop(); state.audio=null; show('s-list'); renderList(); }
+$('au-back').onclick=auSair; $('au-discard').onclick=auSair;
 $('btn-reload').onclick=function(){ loadLeads(false); flushOutbox(); };
 $('btn-pause').onclick=function(){ state.call.running ? pauseCall() : resumeCall(); };
 $('btn-end').onclick=endCall;
@@ -468,7 +737,7 @@ $('call-back').onclick=function(){
 $('rev-back').onclick=function(){ openCall(true); };
 $('btn-send').onclick=send;
 $('btn-discard').onclick=function(){ if(confirm('Descartar esta ligação? O texto será apagado.')){ state.call=null; LS.del('draft'); show('s-list'); renderList(); } };
-$('btn-new').onclick=function(){ $('q').value=''; show('s-list'); renderList(); loadLeads(true); };
+$('btn-new').onclick=function(){ $('done-txt').textContent='O bot lança a ata no Lupe em até 30 min.'; $('q').value=''; show('s-list'); renderList(); loadLeads(true); };
 $('btn-hist').onclick=function(){ show('s-hist'); loadHist(); };
 $('hist-back').onclick=function(){ show('s-list'); };
 $('btn-reset').onclick=function(){ if(confirm('Apagar a configuração deste aparelho?')){ LS.del('cfg'); boot(); } };
@@ -488,7 +757,7 @@ function boot(){
   api('ping').then(function(j){ if(j.vendedor) $('who').textContent=j.vendedor; }).catch(function(){});
 }
 if('serviceWorker' in navigator && location.protocol==='https:') navigator.serviceWorker.register('sw.js').catch(function(){});
-window.__ata = { state: state, Engine: Engine };
+window.__ata = { state: state, Engine: Engine, AudioBox: AudioBox };
 boot();
 })();
 </script>
