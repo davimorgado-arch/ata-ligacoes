@@ -21,6 +21,7 @@
   --safe-top:env(safe-area-inset-top,0px); --safe-bot:env(safe-area-inset-bottom,0px);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
 html,body{margin:0;height:100%;background:var(--bg);color:var(--text);
   font:16px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
 button{font:inherit;border:0;cursor:pointer}
@@ -104,7 +105,7 @@ input.f{width:100%;height:48px;border:1px solid var(--line);border-radius:12px;p
 .spin{width:22px;height:22px;border:3px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:sp 0.8s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
 .bar .row2{margin-top:10px}
-.bar .row2 .btn{height:48px;font-size:15px}
+.bar .row2 .btn{height:50px;font-size:15px}
 .seg{display:flex;gap:8px}
 .seg button{flex:1;height:48px;border-radius:12px;background:#eef2f1;color:var(--text);font-weight:700;font-size:15px;border:2px solid transparent}
 .seg button.on{background:var(--brand-soft);border-color:var(--brand);color:var(--brand)}
@@ -123,6 +124,39 @@ input.f[type=datetime-local]{padding:0 8px;font-size:15px;-webkit-appearance:non
 .filebox .sub{color:var(--muted);font-size:13px}
 audio{width:100%}
 .tag{font-size:11px;font-weight:700;color:var(--muted);margin-left:6px}
+/* kanban */
+.kb{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:6px 14px calc(230px + var(--safe-bot));align-items:flex-start;overscroll-behavior-x:contain}
+.kcol{flex:0 0 84%;max-width:340px;scroll-snap-align:start;scroll-margin-left:14px;background:#e8eeed;border-radius:16px;padding:10px;display:flex;flex-direction:column;gap:8px}
+.kcol>h4{margin:2px 4px 2px;font-size:14px;display:flex;align-items:center;gap:8px;color:#24403d}
+.kcol>h4 .n{margin-left:auto;background:#fff;border-radius:999px;padding:2px 9px;font-size:12px;color:var(--muted)}
+.kcol>h4 i{width:10px;height:10px;border-radius:50%;background:var(--kc,#9fb9b5);flex:0 0 auto}
+.kcol .lead{padding:12px 14px}
+.kcol .vazio{color:var(--muted);font-size:13px;text-align:center;padding:14px 4px}
+.kcol .more{background:#fff;color:var(--brand);font-weight:700;border-radius:12px;height:42px;font-size:14px}
+.kchips{display:flex;gap:8px;overflow-x:auto;padding:8px 14px 4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.kchips::-webkit-scrollbar{display:none}
+.kchip{flex:0 0 auto;background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 12px;font-size:13px;font-weight:600;color:#24403d;white-space:nowrap}
+.kchip b{color:var(--muted);font-weight:700;margin-left:4px}
+.meta .vt{background:#fff;border:1px solid var(--line);border-radius:10px;padding:5px 10px;color:var(--brand);font-weight:700;font-size:13px;margin-left:10px}
+/* avisos (navegador de app, tela de início) */
+.banner{margin:10px 14px 0;background:#fff6dc;color:#5c4200;border-radius:14px;padding:12px 14px;font-size:14px;line-height:1.4}
+.banner .acts{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.banner .acts a,.banner .acts button{background:#fff;color:var(--brand);font-weight:700;border-radius:10px;padding:8px 12px;font-size:14px;text-decoration:none;border:1px solid #f0dfaa}
+.banner .x{float:right;background:none;color:#5c4200;font-size:18px;line-height:1;padding:0 0 0 8px}
+/* folha "Ligar" */
+.sheet-bg{position:fixed;inset:0;background:rgba(10,20,19,.45);z-index:20;display:none}
+.sheet-bg.on{display:block}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;background:#fff;border-radius:20px 20px 0 0;padding:18px 16px calc(16px + var(--safe-bot));transform:translateY(110%);transition:transform .2s;max-height:92vh;overflow:auto}
+.sheet.on{transform:none}
+.sheet h2{margin:0 0 2px;font-size:19px}
+.sheet .sub{color:var(--muted);font-size:13px;margin-bottom:6px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.chips button{background:var(--brand-soft);color:var(--brand);font-weight:700;border-radius:999px;padding:8px 12px;font-size:14px}
+.sw{display:flex;gap:12px;align-items:flex-start;margin-top:14px;padding:12px;border-radius:12px;background:#f4f7f6}
+.sw input{width:22px;height:22px;margin:2px 0 0;accent-color:var(--brand);flex:0 0 auto}
+.sw label{font-weight:700;font-size:15px}
+.sw .h{font-size:12.5px;color:var(--muted);margin-top:3px;font-weight:400}
+a.btn{text-decoration:none}
 </style>
 </head>
 <body>
@@ -132,11 +166,16 @@ audio{width:100%}
   <header class="top"><h1>Configurar app<span class="sub">Feito uma vez por aparelho</span></h1></header>
   <div class="body">
     <div class="card">
-      <p style="margin:0 0 4px">Abra o <b>link do app</b> que o script da sua planilha gerou (função <i>gerarLinkDoApp</i>). Ou cole os dados abaixo.</p>
+      <p style="margin:0 0 4px" id="cfg-intro">Abra o <b>link do app</b> que você recebeu. Ou cole o link inteiro abaixo.</p>
+      <label class="f" for="cfg-link">Link do app</label>
+      <input class="f" id="cfg-link" inputmode="url" autocomplete="off" placeholder="https://davimorgado-arch.github.io/ata-ligacoes/#api=…">
+      <button class="btn ghost" id="cfg-paste" style="margin-top:10px;height:46px" hidden>Colar link copiado</button>
+      <details style="margin-top:12px"><summary style="color:var(--muted);font-size:14px">Ou preencher URL e código separados</summary>
       <label class="f" for="cfg-api">URL do App da Web (termina em /exec)</label>
       <input class="f" id="cfg-api" inputmode="url" autocomplete="off" placeholder="https://script.google.com/macros/s/.../exec">
       <label class="f" for="cfg-tok">Código do app</label>
       <input class="f" id="cfg-tok" autocomplete="off" placeholder="código gerado no setup">
+      </details>
     </div>
     <div class="note err" id="cfg-err" hidden></div>
     <button class="btn" id="cfg-save">Conectar</button>
@@ -156,11 +195,16 @@ audio{width:100%}
       <input id="q" type="search" placeholder="Buscar por empresa, CNPJ ou ID" autocomplete="off" enterkeyhint="search">
     </div>
   </div>
-  <div class="meta"><span id="count">Carregando…</span><span id="upd"></span></div>
+  <div id="banner-list"></div>
+  <div class="meta"><span id="count">Carregando…</span><span style="display:flex;align-items:center"><span id="upd"></span><button class="vt" id="btn-view">Lista</button></span></div>
+  <div class="kchips" id="kchips" hidden></div>
   <div class="list" id="list"></div>
   <div class="bar" id="bar">
     <div class="who">Lead escolhido: <b id="bar-nm">—</b></div>
-    <button class="btn" id="btn-start"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.9V21h2v-2.1A7 7 0 0 0 19 12h-2Z"/></svg>Iniciar ligação</button>
+    <div class="row2" style="margin-top:0">
+      <button class="btn" id="btn-dial"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1Z"/></svg>Ligar</button>
+      <button class="btn ghost" id="btn-start"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.9V21h2v-2.1A7 7 0 0 0 19 12h-2Z"/></svg>Iniciar ligação</button>
+    </div>
     <div class="row2">
       <button class="btn ghost" id="btn-rec"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="6"/></svg>Gravar áudio</button>
       <button class="btn ghost" id="btn-attach"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 11-8.5 8.5a5 5 0 0 1-7-7L14 4a3.5 3.5 0 0 1 5 5l-8.5 8.5a2 2 0 0 1-3-3L15 7"/></svg>Anexar áudio</button>
@@ -173,6 +217,8 @@ audio{width:100%}
 <section class="screen" id="s-audio">
   <header class="top"><button class="iconbtn" id="au-back" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg></button><h1 id="au-title">Áudio<span class="sub" id="au-nm">—</span></h1></header>
   <div class="body">
+    <div id="banner-audio"></div>
+    <div class="note err" id="au-err" hidden role="alert"></div>
     <div class="card" id="au-rec-card" hidden>
       <h3>Gravação</h3>
       <div class="rec">
@@ -196,7 +242,6 @@ audio{width:100%}
     </div>
     <div class="card"><h3>Anotações (opcional)</h3><textarea id="au-notas" placeholder="Ex.: decisor é o Carlos, retornar quinta…"></textarea></div>
     <div class="note" id="au-tip">O bot transcreve o áudio, escreve o resumo e lança no Lupe com o tipo, o horário e a conclusão.</div>
-    <div class="note err" id="au-err" hidden></div>
   </div>
   <div class="foot">
     <button class="btn" id="au-send">Enviar</button>
@@ -215,7 +260,7 @@ audio{width:100%}
   <div class="body">
     <div class="note" id="call-tip">Ligação no <b>viva-voz</b>, aparelho perto. Só o texto é guardado; o áudio <b>não é gravado</b>.<br>Se a ligação estiver <b>neste mesmo celular</b>, o sistema pode bloquear o microfone: use outro aparelho (notebook ou tablet) perto do viva-voz, ou dite um resumo logo após desligar.</div>
     <div class="note err" id="call-err" hidden></div>
-    <div class="card"><h3>Transcrição ao vivo</h3><div class="tx" id="tx"><span class="ph">A transcrição aparece aqui…</span></div></div>
+    <div class="card" id="tx-card"><h3>Transcrição ao vivo</h3><div class="tx" id="tx"><span class="ph">A transcrição aparece aqui…</span></div></div>
     <div class="card"><h3>Anotações</h3><textarea id="notas" placeholder="Ex.: decisor é o Carlos, fatura vence dia 10, retornar quinta…"></textarea></div>
   </div>
   <div class="foot">
@@ -230,6 +275,8 @@ audio{width:100%}
 <section class="screen" id="s-review">
   <header class="top"><button class="iconbtn" id="rev-back" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg></button><h1>Revisar<span class="sub" id="rev-nm">—</span></h1></header>
   <div class="body">
+    <div class="card" id="rev-audio" hidden><h3>Áudio gravado na ligação</h3><audio id="rev-player" controls preload="metadata"></audio>
+      <div class="sub" id="rev-audio-info" style="color:var(--muted);font-size:13px;margin-top:6px"></div></div>
     <div class="card"><h3>Transcrição (pode editar)</h3><textarea class="big" id="rev-tx"></textarea></div>
     <div class="card"><h3>Anotações</h3><textarea id="rev-notas"></textarea></div>
     <div class="card"><h3>Horário da ligação</h3>
@@ -263,6 +310,26 @@ audio{width:100%}
   <div style="padding:8px 16px 30px"><button class="btn ghost" id="btn-reset">Trocar configuração</button></div>
 </section>
 
+<!-- ===================== LIGAR (discador) ===================== -->
+<div class="sheet-bg" id="dial-bg"></div>
+<div class="sheet" id="dial" role="dialog" aria-modal="true" aria-labelledby="dial-t">
+  <h2 id="dial-t">Ligar</h2>
+  <div class="sub" id="dial-nm">—</div>
+  <div class="chips" id="dial-chips"></div>
+  <label class="f" for="dial-num">Telefone</label>
+  <input class="f" id="dial-num" type="tel" inputmode="tel" autocomplete="tel" placeholder="(11) 98765-4321">
+  <div class="sw" id="dial-sw" hidden>
+    <input type="checkbox" id="dial-rec">
+    <div><label for="dial-rec">Gravar a ligação no viva-voz</label>
+      <div class="h" id="dial-rec-h">Liga o microfone antes de discar. No iPhone, a gravação costuma parar quando a ligação começa neste mesmo aparelho: o que for gravado fica salvo e você segue com o cronômetro e as anotações.</div></div>
+  </div>
+  <div class="note err" id="dial-err" hidden style="margin-top:12px"></div>
+  <div style="display:flex;flex-direction:column;gap:10px;margin-top:14px">
+    <a class="btn" id="dial-go" href="tel:">Discar e iniciar</a>
+    <button class="btn ghost" id="dial-cancel">Cancelar</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -274,7 +341,7 @@ var LS = {
   del: function(k){ try{ localStorage.removeItem('ata.'+k); }catch(e){} }
 };
 var $ = function(id){ return document.getElementById(id); };
-var state = { leads: LS.get('leads', []), sel: null, call: null, audio: null };
+var state = { leads: LS.get('leads', []), sel: null, call: null, callGrav: null, callAudio: null, dialGrav: null, audio: null, view: LS.get('view','kanban'), kcap: {}, srv: LS.get('srv', {}) };
 
 /* ---------- utilidades ---------- */
 function show(id){ document.querySelectorAll('.screen').forEach(function(s){ s.classList.toggle('on', s.id===id); }); window.scrollTo(0,0); }
@@ -305,14 +372,27 @@ function api(acao, extra){
 }
 
 /* ---------- configuração (link com #api=...&t=...) ---------- */
+function cfgDeTexto(txt){
+  var t=String(txt||'').trim(), i=t.indexOf('#'); if(i===-1) return null;
+  var p=new URLSearchParams(t.slice(i+1));
+  return (p.get('api') && p.get('t')) ? { api:p.get('api'), token:p.get('t') } : null;
+}
 function readHash(){
-  var h = location.hash.replace(/^#/,''); if(!h) return;
-  var p = new URLSearchParams(h);
-  if(p.get('api') && p.get('t')) LS.set('cfg', { api: p.get('api'), token: p.get('t') });
+  var c = cfgDeTexto(location.hash);
+  if(c) LS.set('cfg', c);
+}
+/* Mantém a configuração no endereço (#api=…&t=…). No iPhone, o ícone da tela de início guarda o endereço atual
+   e tem memória separada do Safari: assim ele já abre conectado. (O manifest não tem start_url de propósito.) */
+function hashDaCfg(){
+  var c=cfg(); if(!c) return;
+  if(cfgDeTexto(location.hash)) return;
+  try{ history.replaceState(null, '', location.pathname + location.search + '#api=' + encodeURIComponent(c.api) + '&t=' + encodeURIComponent(c.token)); }catch(e){}
 }
 function saveCfg(){
   var a = $('cfg-api').value.trim(), t = $('cfg-tok').value.trim(), e = $('cfg-err');
   e.hidden = true;
+  var link = $('cfg-link').value.trim();
+  if(link){ var lc=cfgDeTexto(link); if(!lc){ e.textContent='Esse link não tem a configuração do app (precisa ter "#api=" e "&t=").'; e.hidden=false; return; } a=lc.api; t=lc.token; }
   if(!/^https:\/\/script\.google(usercontent)?\.com\//.test(a) && !/^https?:\/\/(localhost|127\.0\.0\.1)/.test(a)){ e.textContent='A URL deve ser do Google Apps Script (https://script.google.com/…/exec).'; e.hidden=false; return; }
   if(t.length < 16){ e.textContent='Código do app inválido.'; e.hidden=false; return; }
   LS.set('cfg', { api:a, token:t });
@@ -329,17 +409,55 @@ function renderList(){
   });
   $('count').textContent = leads.length + (leads.length===1?' lead':' leads') + (q ? ' encontrados' : ' no funil');
   var up = LS.get('leadsAt', null); $('upd').textContent = up ? 'Lista de ' + new Date(up).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '';
-  var max = 200, html = leads.slice(0,max).map(function(l){
-    var sel = state.sel && state.sel.lead_id===l.lead_id;
-    return '<button class="lead'+(sel?' sel':'')+'" data-id="'+esc(l.lead_id)+'">'+
-      '<div class="nm">'+esc(l.empresa||l.razao_social||'(sem nome)')+'</div>'+
-      (l.razao_social && l.razao_social!==l.empresa ? '<div class="rs">'+esc(l.razao_social)+'</div>' : '')+
-      '<div class="row">'+(l.etapa?'<span class="pill etapa">'+esc(l.etapa)+'</span>':'')+
-      '<span class="mono">#'+esc(l.lead_id)+'</span>'+(l.cnpj?'<span class="mono">'+esc(fmtCnpj(l.cnpj))+'</span>':'')+'</div></button>';
-  }).join('');
+  var kanban = state.view==='kanban';
+  $('btn-view').textContent = kanban ? 'Lista' : 'Kanban';
+  $('list').className = kanban ? 'kb' : 'list';
+  $('kchips').hidden = !kanban || !leads.length;
+  if(!leads.length){
+    $('list').className='list';
+    $('list').innerHTML = '<div class="empty">'+(state.leads.length?'Nenhum lead encontrado para essa busca.':'A lista de leads está vazia. O bot atualiza todo dia às 7h.')+'</div>';
+    return;
+  }
+  if(kanban) return renderKanban(leads, !!q);
+  var max = 200, html = leads.slice(0,max).map(cardHtml).join('');
   if(leads.length>max) html += '<div class="empty">Mostrando '+max+' de '+leads.length+'. Refine a busca.</div>';
-  if(!leads.length) html = '<div class="empty">'+(state.leads.length?'Nenhum lead encontrado para essa busca.':'A lista de leads está vazia. O bot atualiza todo dia às 7h.')+'</div>';
   $('list').innerHTML = html;
+}
+function cardHtml(l){
+  var sel = state.sel && state.sel.lead_id===l.lead_id;
+  return '<button class="lead'+(sel?' sel':'')+'" data-id="'+esc(l.lead_id)+'">'+
+    '<div class="nm">'+esc(l.empresa||l.razao_social||'(sem nome)')+'</div>'+
+    (l.razao_social && l.razao_social!==l.empresa ? '<div class="rs">'+esc(l.razao_social)+'</div>' : '')+
+    '<div class="row">'+(state.view!=='kanban' && l.etapa?'<span class="pill etapa">'+esc(l.etapa)+'</span>':'')+
+    '<span class="mono">#'+esc(l.lead_id)+'</span>'+(l.cnpj?'<span class="mono">'+esc(fmtCnpj(l.cnpj))+'</span>':'')+'</div></button>';
+}
+/* Ordem do funil "Ludfor Energia" no Kanban do Lupe. Etapas desconhecidas entram no fim. */
+var ETAPAS = ['Novo Lead','Contato Realizado','Lead Qualificado','Solução Apresentada','Proposta Enviada','Em Negociação','Ganho'];
+var CORES = ['#8aa3a0','#4f8fbf','#2e9e7a','#b98a12','#d0711e','#a05bb5','#1b8a4b'];
+var KCAP = 30;
+function colunas(leads, buscando){
+  var cols = {}, ordem = [];
+  ETAPAS.forEach(function(e){ cols[norm(e)] = { nome:e, itens:[] }; ordem.push(norm(e)); });
+  leads.forEach(function(l){
+    var nome = String(l.etapa||'').trim() || 'Sem etapa', k = norm(nome);
+    if(!cols[k]){ cols[k] = { nome:nome, itens:[], extra:true }; ordem.push(k); }
+    cols[k].itens.push(l);
+  });
+  var fixas = ordem.filter(function(k){ return !cols[k].extra; });
+  var extras = ordem.filter(function(k){ return cols[k].extra; }).sort(function(a,b){ return a==='sem etapa' ? 1 : b==='sem etapa' ? -1 : a.localeCompare(b); });
+  return fixas.concat(extras).map(function(k){ return cols[k]; }).filter(function(c){ return !buscando || c.itens.length; });
+}
+function renderKanban(leads, buscando){
+  var cs = colunas(leads, buscando);
+  state.kcap = state.kcap || {};
+  $('kchips').innerHTML = cs.map(function(c, i){ return '<button class="kchip" data-col="'+i+'">'+esc(c.nome)+'<b>'+c.itens.length+'</b></button>'; }).join('');
+  $('list').innerHTML = cs.map(function(c, i){
+    var cap = state.kcap[c.nome] || KCAP, cor = CORES[ETAPAS.indexOf(c.nome)] || '#9fb9b5';
+    return '<section class="kcol" data-etapa="'+esc(c.nome)+'" style="--kc:'+cor+'"><h4><i></i>'+esc(c.nome)+'<span class="n">'+c.itens.length+'</span></h4>'+
+      (c.itens.length ? c.itens.slice(0, cap).map(cardHtml).join('') : '<div class="vazio">Nenhum lead nesta etapa</div>')+
+      (c.itens.length > cap ? '<button class="more" data-etapa="'+esc(c.nome)+'">Mostrar mais ('+(c.itens.length-cap)+' restantes)</button>' : '')+
+      '</section>';
+  }).join('');
 }
 function loadLeads(silent){
   if(!silent) $('count').textContent='Atualizando…';
@@ -355,13 +473,44 @@ function selectLead(id){
   state.sel = (state.sel && state.sel.lead_id===id) ? null : l;
   $('bar').classList.toggle('on', !!state.sel);
   if(state.sel) $('bar-nm').textContent = (state.sel.empresa||state.sel.razao_social) + '  #' + state.sel.lead_id;
-  renderList();
+  document.querySelectorAll('#list .lead').forEach(function(b){ b.classList.toggle('sel', !!state.sel && b.getAttribute('data-id')===String(state.sel.lead_id)); });
 }
 
 /* ---------- transcrição (Web Speech API, sem gravar áudio) ---------- */
 var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 var isIOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
 var standalone = window.navigator.standalone === true || (window.matchMedia && matchMedia('(display-mode: standalone)').matches);
+var UA = navigator.userAgent || '';
+var isSafari = /^((?!chrome|android|crios|fxios|edgios).)*safari/i.test(UA);
+// Navegadores embutidos em apps (Gmail, Instagram, WhatsApp, Facebook…) costumam bloquear o microfone e têm memória separada.
+var inAppName = /FBAN|FBAV|FB_IAB/.test(UA) ? 'Facebook' : /Instagram/.test(UA) ? 'Instagram' : /WhatsApp/i.test(UA) ? 'WhatsApp'
+  : /GSA\//.test(UA) ? 'app do Google' : /LinkedInApp/.test(UA) ? 'LinkedIn' : /Line\//.test(UA) ? 'Line'
+  : (isIOS && !standalone && !/Safari\//.test(UA) && !/CriOS|FxiOS|EdgiOS/.test(UA)) ? 'Gmail (ou outro app)' : '';
+var inApp = !!inAppName;
+function linkSafari(){ return 'x-safari-' + location.href; } // iOS 17+: abre a mesma página no Safari
+function renderBanner(id, foco){
+  var el=$(id); if(!el) return;
+  var h='';
+  if(inApp && isIOS){
+    h='<div class="banner" role="note"><b>Aberto dentro do '+esc(inAppName)+'.</b> Aqui o microfone e o ícone da tela de início não funcionam direito. Abra no <b>Safari</b>: toque em ⋯ (ou no ícone de bússola) > <b>Abrir no Safari</b>.'+
+      '<div class="acts"><a href="'+esc(linkSafari())+'" class="js-safari">Abrir no Safari</a><button class="js-copy">Copiar link</button></div></div>';
+  } else if(inApp){
+    h='<div class="banner" role="note"><b>Aberto dentro do '+esc(inAppName)+'.</b> Para gravar e instalar o app, toque em ⋮ > <b>Abrir no Chrome</b>.<div class="acts"><button class="js-copy">Copiar link</button></div></div>';
+  } else if(isIOS && !standalone && !foco && !LS.get('dicaIcone',false)){
+    h='<div class="banner" role="note"><button class="x js-x" aria-label="Fechar">×</button><b>Dica:</b> para usar como app, toque em <b>Compartilhar</b> (□↑) > <b>Adicionar à Tela de Início</b>. O ícone já abre conectado.</div>';
+  }
+  el.innerHTML=h;
+}
+function copiarLink(){
+  var u=location.href;
+  (navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(u) : Promise.reject())
+    .then(function(){ toast('Link copiado. Cole no Safari.'); })
+    .catch(function(){ window.prompt('Copie o link e cole no Safari:', u); });
+}
+document.addEventListener('click', function(ev){
+  if(ev.target.closest('.js-copy')){ ev.preventDefault(); copiarLink(); }
+  else if(ev.target.closest('.js-x')){ LS.set('dicaIcone', true); ev.target.closest('.banner').remove(); }
+});
 
 var Engine = {
   rec:null, want:false, fails:0, lastStart:0,
@@ -435,22 +584,33 @@ function renderTx(interim){
 }
 var tick;
 function setRunningUI(){
-  var c=state.call;
+  var c=state.call, grav=gravAtivo(state.callGrav);
   $('dot').classList.toggle('live', c.running);
-  $('stxt').textContent = c.running ? 'Transcrevendo' : (c.acc ? 'Pausado' : 'Pronto para ouvir');
+  $('stxt').textContent = c.running ? (c.modo==='voz' && SR ? 'Transcrevendo' : grav ? 'Gravando · em ligação' : 'Em ligação') : (c.acc ? 'Pausado' : 'Pronto para ouvir');
   $('btn-pause').textContent = c.running ? 'Pausar' : (c.acc ? 'Retomar' : 'Começar');
   clearInterval(tick);
   if(c.running) tick=setInterval(function(){ $('timer').textContent=mmss(callElapsed()); }, 500);
   $('timer').textContent=mmss(callElapsed());
 }
-function openCall(resume){
-  var l=state.sel;
-  if(!resume) state.call = { id:uid(), lead_id:l.lead_id, lead_nome:(l.empresa||l.razao_social||''), cnpj:l.cnpj||'', etapa:l.etapa||'', transcricao:'', notas:'', acc:0, since:0, running:false, startedAt:Date.now(), endedAt:0 };
+/** opts: { modo:'voz' (transcrição ao vivo, padrão) | 'discado' (Ligar: cronômetro + anotações), telefone, grav } */
+function openCall(resume, opts){
+  var l=state.sel; opts=opts||{};
+  if(!resume){
+    state.call = { id:uid(), lead_id:l.lead_id, lead_nome:(l.empresa||l.razao_social||''), cnpj:l.cnpj||'', etapa:l.etapa||'', transcricao:'', notas:'',
+      acc:0, since:0, running:false, startedAt:Date.now(), endedAt:0, modo:opts.modo||'voz', telefone:opts.telefone||'', gravou:!!opts.grav };
+    state.callGrav = opts.grav || null; state.callAudio = null;
+    if(state.callGrav){ state.callGrav.t0 = state.callGrav.t0 || Date.now(); }
+  }
   var c=state.call;
   $('call-nm').textContent=c.lead_nome;
-  $('call-info').textContent='#'+c.lead_id + (c.cnpj?' · '+fmtCnpj(c.cnpj):'') + (c.etapa?' · '+c.etapa:'');
+  $('call-info').textContent='#'+c.lead_id + (c.telefone?' · '+c.telefone:'') + (c.cnpj?' · '+fmtCnpj(c.cnpj):'') + (c.etapa?' · '+c.etapa:'');
   $('notas').value=c.notas; $('call-err').hidden=true;
-  if(!SR){
+  $('tx-card').hidden = c.modo!=='voz';
+  if(c.modo!=='voz'){
+    $('call-tip').innerHTML = state.callGrav
+      ? '🎙️ <b>Gravando no viva-voz.</b> Se o celular cortar o microfone quando a ligação começar, o que foi gravado fica salvo e você segue pelo cronômetro e pelas anotações. Ao desligar, volte aqui e toque em <b>Encerrar</b>.'
+      : 'Ligação para <b>'+esc(c.telefone||'o lead')+'</b>. O cronômetro marca o início e o fim. Escreva as anotações durante ou logo depois e toque em <b>Encerrar</b> ao desligar.';
+  } else if(!SR){
     $('call-tip').innerHTML = isIOS && standalone
       ? 'No iPhone, a transcrição automática não funciona no app da tela de início. Use o <b>microfone do teclado</b> nas anotações, ou abra o link no <b>Safari</b>.'
       : 'Este navegador não tem transcrição automática. Use o Chrome (Android) ou Safari (iPhone), ou dite pelo microfone do teclado nas anotações.';
@@ -458,46 +618,134 @@ function openCall(resume){
   show('s-call'); setRunningUI(); renderTx(''); draft();
   if(!resume) resumeCall();
 }
+function gravInterrompida(g){
+  if(state.callGrav!==g || !state.call) return;
+  var dur=mmss((g.fimT||Date.now())-g.t0);
+  $('call-tip').innerHTML='⚠️ <b>A gravação parou</b> quando o celular passou o microfone para a ligação (comum no iPhone). Os <b>'+dur+'</b> gravados ficam salvos e vão junto. Siga pelo cronômetro e escreva as anotações.';
+  setRunningUI();
+}
 function resumeCall(){
   var c=state.call; if(c.running) return;
   $('call-err').hidden=true;
-  if(!SR){ $('notas').focus(); return; }
   c.running=true; c.since=Date.now();
-  Engine.start(); keepAwake(true); setRunningUI(); renderTx(''); draft();
+  var g=state.callGrav; if(gravAtivo(g) && g.mr.state==='paused'){ try{ g.mr.resume(); }catch(e){} }
+  if(c.modo==='voz' && SR) Engine.start(); else if(c.modo==='voz') $('notas').focus();
+  keepAwake(true); setRunningUI(); renderTx(''); draft();
 }
 function pauseCall(){
   var c=state.call; if(!c || !c.running) { if(c) setRunningUI(); return; }
   c.acc += Date.now()-c.since; c.running=false;
-  Engine.stop(); keepAwake(false); setRunningUI(); renderTx(''); draft();
+  var g=state.callGrav; if(gravAtivo(g) && g.mr.state==='recording' && g.mr.pause){ try{ g.mr.pause(); }catch(e){} }
+  if(c.modo==='voz') Engine.stop();
+  keepAwake(false); setRunningUI(); renderTx(''); draft();
 }
 function endCall(){
   pauseCall();
   var c=state.call; c.notas=$('notas').value; c.endedAt=Date.now(); draft();
-  $('rev-ini').value=c.startedAt?toLocalInput(new Date(c.startedAt)):''; $('rev-fim').value=toLocalInput(new Date(c.endedAt));
-  $('rev-nm').textContent=c.lead_nome; $('rev-lead').textContent=c.lead_nome+' (#'+c.lead_id+')';
-  $('rev-tx').value=c.transcricao; $('rev-notas').value=c.notas; $('rev-err').hidden=true;
-  show('s-review');
+  var g=state.callGrav;
+  function revisar(){
+    $('rev-ini').value=c.startedAt?toLocalInput(new Date(c.startedAt)):''; $('rev-fim').value=toLocalInput(new Date(c.endedAt));
+    $('rev-nm').textContent=c.lead_nome; $('rev-lead').textContent=c.lead_nome+' (#'+c.lead_id+')';
+    $('rev-tx').value=c.transcricao; $('rev-notas').value=c.notas; $('rev-err').hidden=true;
+    var a=state.callAudio, p=$('rev-player');
+    $('rev-audio').hidden=!a;
+    if(a){
+      try{ if(p.src) URL.revokeObjectURL(p.src); }catch(e){}
+      p.src=URL.createObjectURL(a.blob);
+      $('rev-audio-info').textContent=mb(a.blob.size)+' · '+mmss(a.dur*1000)+(a.interrompido?' · a gravação parou durante a ligação':'')+
+        (state.srv.audio_na_ligacao?' · vai junto com a ligação; o bot transcreve':' · a planilha ainda não aceita áudio na ligação: só o texto será enviado');
+    }
+    show('s-review');
+  }
+  if(!g) return revisar();
+  var feito=false;
+  var fim=function(blob){ if(feito) return; feito=true; state.callGrav=null;
+    if(blob && blob.size) state.callAudio={ blob:blob, mime:g.mime, nome:'ligacao.'+extDoMime(g.mime), dur:((g.fimT||Date.now())-g.t0)/1000, interrompido:g.interrompido };
+    revisar(); };
+  gravParar(g, fim);
+  setTimeout(function(){ fim(g.blob || new Blob(g.chunks,{type:g.mime})); }, 3000);
 }
+function descartarGravacao(){ if(state.callGrav){ gravParar(state.callGrav); state.callGrav=null; } state.callAudio=null; }
 
 /* ---------- envio (com caixa de saída para reenvio) ---------- */
 function payload(c){ return { id:c.id, lead_id:c.lead_id, lead_nome:c.lead_nome, transcricao:c.transcricao, notas:c.notas,
-  origem:'ligacao', tipo:'Ligacao', hora_inicio:fromLocalInput(c.horaIni), hora_fim:fromLocalInput(c.horaFim) }; }
+  origem:'ligacao', tipo:'Ligacao', hora_inicio:fromLocalInput(c.horaIni), hora_fim:fromLocalInput(c.horaFim), telefone:c.telefone||'' }; }
 function send(){
   var c=state.call;
   c.transcricao=$('rev-tx').value; c.notas=$('rev-notas').value; c.horaIni=$('rev-ini').value; c.horaFim=$('rev-fim').value; draft();
-  if(!c.transcricao.trim() && !c.notas.trim()){ var e=$('rev-err'); e.textContent='Escreva algo na transcrição ou nas anotações antes de enviar.'; e.hidden=false; return; }
+  var a = state.srv.audio_na_ligacao ? state.callAudio : null;
+  if(!a && !c.transcricao.trim() && !c.notas.trim()){ var e=$('rev-err'); e.textContent='Escreva algo na transcrição ou nas anotações antes de enviar.'; e.hidden=false; return; }
   if(c.horaIni && c.horaFim && c.horaFim<c.horaIni){ var e2=$('rev-err'); e2.textContent='A hora final está antes da inicial.'; e2.hidden=false; return; }
   var b=$('btn-send'); b.disabled=true; b.innerHTML='<span class="spin"></span>Enviando…';
-  api('enviar', { ligacao: payload(c) }).then(function(j){
-    LS.del('draft'); state.call=null; state.sel=null; $('bar').classList.remove('on');
+  var meta=payload(c);
+  var envio = a ? sendAudioItem(meta, a.blob, a.nome, a.mime) : api('enviar', { ligacao: meta });
+  function limpar(){ LS.del('draft'); state.call=null; state.callAudio=null; state.sel=null; $('bar').classList.remove('on'); }
+  envio.then(function(j){
+    limpar();
     var w=$('done-warn'); w.hidden=!(j.avisos&&j.avisos.length); w.textContent=(j.avisos||[]).join(' ');
     show('s-done');
   }).catch(function(err){
-    var out=LS.get('outbox',[]); if(!out.some(function(x){return x.id===c.id;})) out.push(payload(c)); LS.set('outbox',out);
-    LS.del('draft'); state.call=null; state.sel=null; $('bar').classList.remove('on');
-    $('done-warn').hidden=false; $('done-warn').textContent='Sem conexão com a planilha ('+err.message+'). A ligação ficou guardada neste aparelho e será reenviada automaticamente.';
-    show('s-done');
+    var guardar = a
+      ? AudioBox.put({ id:meta.id, meta:meta, blob:a.blob, nome:a.nome, mime:a.mime })
+      : Promise.resolve().then(function(){ var out=LS.get('outbox',[]); if(!out.some(function(x){return x.id===c.id;})) out.push(meta); LS.set('outbox',out); });
+    return guardar.then(function(){
+      limpar();
+      $('done-warn').hidden=false; $('done-warn').textContent='Sem conexão com a planilha ('+err.message+'). A ligação ficou guardada neste aparelho e será reenviada automaticamente.';
+      show('s-done');
+    }).catch(function(){ var e3=$('rev-err'); e3.textContent='Sem conexão ('+err.message+') e não consegui guardar o áudio. Não feche esta tela e toque em Enviar de novo.'; e3.hidden=false; });
   }).finally(function(){ b.disabled=false; b.textContent='Enviar'; });
+}
+
+/* ---------- Ligar: discador do celular + início da ligação no mesmo toque ---------- */
+function telLimpo(v){ v=String(v||'').trim(); return (v.charAt(0)==='+'?'+':'') + digits(v); }
+function telefonesDe(l){
+  var lista=[].concat(l.telefones||[], l.telefone||[]).join(';').split(/[;,|\/]+/), out=[], vistos={};
+  lista.concat(LS.get('tel.'+l.lead_id, [])).forEach(function(t){ t=String(t||'').trim(); var k=digits(t); if(k.length>=8 && !vistos[k]){ vistos[k]=1; out.push(t); } });
+  return out;
+}
+function openDial(){
+  var l=state.sel; if(!l) return;
+  if(state.dialGrav){ gravParar(state.dialGrav); state.dialGrav=null; }
+  var tels=telefonesDe(l);
+  $('dial-nm').textContent=(l.empresa||l.razao_social||'')+'  #'+l.lead_id;
+  $('dial-chips').innerHTML=tels.map(function(t){ return '<button data-tel="'+esc(t)+'">'+esc(t)+'</button>'; }).join('');
+  $('dial-num').value=tels[0]||''; dialHref();
+  $('dial-sw').hidden = !state.srv.audio_na_ligacao;
+  $('dial-rec').checked=false; $('dial-err').hidden=true;
+  $('dial-rec-h').textContent = micDisponivel()
+    ? 'Liga o microfone antes de discar. No iPhone, a gravação costuma parar quando a ligação começa neste mesmo aparelho: o que for gravado fica salvo e você segue com o cronômetro e as anotações.'
+    : msgSemMic();
+  $('dial-bg').classList.add('on'); $('dial').classList.add('on');
+  if(!tels.length) setTimeout(function(){ $('dial-num').focus(); }, 250);
+}
+function closeDial(descartar){
+  $('dial-bg').classList.remove('on'); $('dial').classList.remove('on');
+  if(descartar && state.dialGrav){ gravParar(state.dialGrav); }
+  state.dialGrav=null;
+}
+function dialHref(){ $('dial-go').setAttribute('href', 'tel:'+telLimpo($('dial-num').value)); }
+function dialErr(msg){ var e=$('dial-err'); e.textContent=msg||''; e.hidden=!msg; }
+function dialRecToggle(){
+  var cb=$('dial-rec'); dialErr('');
+  if(!cb.checked){ if(state.dialGrav){ gravParar(state.dialGrav); state.dialGrav=null; } $('dial-rec-h').textContent='Gravação desligada.'; return; }
+  $('dial-rec-h').textContent='Abrindo o microfone…';
+  micGravar({
+    ok:function(g){ if(!$('dial').classList.contains('on') || !cb.checked){ gravParar(g); return; } state.dialGrav=g; $('dial-rec-h').innerHTML='🎙️ <b>Gravando.</b> Agora toque em <b>Discar e iniciar</b> e ponha no viva-voz.'; },
+    erro:function(msg){ cb.checked=false; $('dial-rec-h').textContent=''; dialErr(msg); },
+    interrompido:function(m, g){ gravInterrompida(g); }
+  });
+}
+function dialGo(ev){
+  var l=state.sel, num=telLimpo($('dial-num').value);
+  if(!l){ ev.preventDefault(); return; }
+  if(digits(num).length<8){ ev.preventDefault(); dialErr('Digite ou cole o telefone (com DDD).'); return; }
+  dialHref();
+  var salvos=LS.get('tel.'+l.lead_id, []), vis=$('dial-num').value.trim();
+  if(salvos.map(digits).indexOf(digits(vis))===-1){ salvos.unshift(vis); LS.set('tel.'+l.lead_id, salvos.slice(0,5)); }
+  var g=state.dialGrav; state.dialGrav=null;
+  closeDial(false);
+  openCall(false, { modo:'discado', telefone:vis, grav:g });
+  // sem preventDefault: o link tel: abre o discador do celular neste mesmo toque
 }
 function flushOutbox(){
   var out=LS.get('outbox',[]);
@@ -569,14 +817,17 @@ function mimeDe(file){
 }
 function pickRecMime(){
   if(!window.MediaRecorder || !MediaRecorder.isTypeSupported) return '';
-  var opts=['audio/webm;codecs=opus','audio/mp4;codecs=mp4a.40.2','audio/mp4','audio/webm','audio/ogg;codecs=opus','audio/aac'];
+  // Safari/iPhone grava melhor em mp4 (AAC); Chrome/Android em webm (Opus).
+  var opts = (isIOS || isSafari)
+    ? ['audio/mp4;codecs=mp4a.40.2','audio/mp4','audio/aac','audio/webm;codecs=opus','audio/webm']
+    : ['audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus','audio/mp4;codecs=mp4a.40.2','audio/mp4','audio/aac'];
   for(var i=0;i<opts.length;i++){ try{ if(MediaRecorder.isTypeSupported(opts[i])) return opts[i]; }catch(e){} }
   return '';
 }
 function extDoMime(m){ m=String(m||''); return m.indexOf('webm')!==-1?'webm':m.indexOf('ogg')!==-1?'ogg':(m.indexOf('mp4')!==-1||m.indexOf('aac')!==-1)?'m4a':'audio'; }
 
-var Rec = { mr:null, stream:null, chunks:[], t0:0, tick:null };
-function auErr(msg){ var e=$('au-err'); e.textContent=msg||''; e.hidden=!msg; }
+var Rec = { g:null, tick:null };
+function auErr(msg){ var e=$('au-err'); e.textContent=msg||''; e.hidden=!msg; if(msg && e.scrollIntoView) e.scrollIntoView({block:'center', behavior:'smooth'}); }
 function openAudio(modo){
   var l=state.sel; if(!l) return;
   state.audio = { id:uid(), modo:modo, lead_id:l.lead_id, lead_nome:(l.empresa||l.razao_social||''), tipo:'', blob:null, nome:'', mime:'', dur:0 };
@@ -588,10 +839,10 @@ function openAudio(modo){
   $('au-notas').value=''; $('au-ini').value=''; $('au-fim').value=''; auErr('');
   document.querySelectorAll('#au-tipo button').forEach(function(b){ b.classList.remove('on'); });
   $('au-timer').textContent='00:00'; $('au-rstat').textContent='Toque para gravar'; $('au-recbtn').classList.remove('on');
-  if(modo==='gravado' && (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder)){
-    auErr('Este navegador não grava áudio. Atualize o iPhone/Android ou use "Anexar áudio" com um áudio gravado no gravador do celular.');
-  }
+  if(Rec.g){ gravParar(Rec.g); Rec.g=null; }
   show('s-audio');
+  renderBanner('banner-audio', modo==='gravado');
+  if(modo==='gravado' && !micDisponivel()) auErr(msgSemMic());
 }
 function setAudioBlob(blob, nome, mime){
   var a=state.audio; a.blob=blob; a.nome=nome; a.mime=mime;
@@ -628,44 +879,100 @@ function onFilePicked(file){
     if(file.size > AUDIO_AVISO) auErr('Áudio grande ('+mb(file.size)+'): o envio pode demorar. Prefira Wi-Fi.');
   });
 }
+/* Microfone: getUserMedia é chamado direto no toque (sem await antes), como o iOS exige. */
+function micDisponivel(){ return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder); }
+function msgSemMic(){
+  return inApp
+    ? 'O navegador dentro do '+inAppName+' não libera o microfone. Toque em "Abrir no Safari" (ou ⋯ > Abrir no navegador) e grave por lá. Enquanto isso, use "Anexar áudio" com um áudio do gravador ou do WhatsApp.'
+    : 'Este navegador não grava áudio. '+(isIOS?'Abra no Safari com o iOS atualizado':'Use o Chrome atualizado')+', ou use "Anexar áudio" com um áudio do gravador ou do WhatsApp.';
+}
+function msgErroMic(e){
+  var n = e && e.name;
+  if(n==='NotAllowedError' || n==='SecurityError' || n==='PermissionDeniedError')
+    return isIOS
+      ? 'Permissão do microfone negada. No iPhone: Ajustes > Safari > Microfone > "Perguntar" ou "Permitir". Ou, no Safari, toque em "aA" na barra de endereço > Ajustes do Site > Microfone > Permitir. Depois toque de novo para gravar.'+(inApp?' Dentro do '+inAppName+' isso não funciona: abra no Safari.':'')
+      : 'Permissão do microfone negada. Toque no cadeado da barra de endereço > Permissões > Microfone > Permitir e tente de novo.';
+  if(n==='NotFoundError' || n==='OverconstrainedError') return 'Nenhum microfone encontrado neste aparelho.';
+  if(n==='NotReadableError' || n==='AbortError' || n==='TrackStartError') return 'O microfone está ocupado (outro app ou uma ligação em andamento). Feche o outro app ou espere a ligação terminar e tente de novo.';
+  if(n==='Timeout') return 'O navegador não respondeu ao pedido do microfone.'+(inApp?' Isso é comum dentro do '+inAppName+': abra no Safari.':' Recarregue a página e tente de novo.');
+  return 'Não consegui abrir o microfone ('+((e&&e.message)||n||e)+').';
+}
+/** Abre o microfone e começa a gravar. cb.ok(g) com o gravador; cb.erro(msg); cb.interrompido(motivo) se o sistema cortar o microfone. */
+function micGravar(cb){
+  if(!micDisponivel()){ cb.erro(msgSemMic()); return; }
+  var acabou=false, prom;
+  var timer=setTimeout(function(){ if(acabou) return; acabou=true; cb.erro(msgErroMic({name:'Timeout'})); }, 12000);
+  try{ prom = navigator.mediaDevices.getUserMedia({ audio:true }); }
+  catch(e){ clearTimeout(timer); cb.erro(msgErroMic(e)); return; }
+  prom.then(function(stream){
+    if(acabou){ stream.getTracks().forEach(function(t){ t.stop(); }); return; }
+    acabou=true; clearTimeout(timer);
+    var mime=pickRecMime(), mr;
+    try{ mr = mime ? new MediaRecorder(stream, { mimeType:mime, audioBitsPerSecond:32000 }) : new MediaRecorder(stream); }
+    catch(e){ try{ mr=new MediaRecorder(stream); }catch(e2){ stream.getTracks().forEach(function(t){ t.stop(); }); cb.erro('Este navegador não consegue gravar ('+(e2.message||e2)+'). Use "Anexar áudio".'); return; } }
+    var g = { mr:mr, stream:stream, chunks:[], t0:Date.now(), fimT:0, mime:mr.mimeType||mime||'audio/mp4', parado:false, interrompido:'', _cbs:[] };
+    mr.ondataavailable=function(ev){ if(ev.data && ev.data.size) g.chunks.push(ev.data); };
+    mr.onstop=function(){
+      g.parado=true; g.fimT=g.fimT||Date.now();
+      stream.getTracks().forEach(function(t){ try{ t.stop(); }catch(e){} });
+      var blob=new Blob(g.chunks,{type:g.mime}); g.blob=blob;
+      var l=g._cbs; g._cbs=[]; l.forEach(function(f){ f(blob); });
+      if(g.interrompido && cb.interrompido) cb.interrompido(g.interrompido, g);
+    };
+    mr.onerror=function(ev){ g.interrompido=g.interrompido||('erro: '+((ev.error&&ev.error.message)||'gravador')); gravParar(g); };
+    stream.getAudioTracks().forEach(function(t){
+      // iOS corta (mute/ended) a captura quando entra uma ligação ou o Safari vai para segundo plano.
+      t.addEventListener('ended', function(){ if(!g.parado){ g.interrompido=g.interrompido||'microfone encerrado pelo sistema'; gravParar(g); } });
+      t.addEventListener('mute', function(){ if(!g.parado){ g.interrompido=g.interrompido||'microfone cortado pelo sistema'; gravParar(g); } });
+    });
+    try{ mr.start(1000); }catch(e){ stream.getTracks().forEach(function(t){ t.stop(); }); cb.erro('Não consegui iniciar a gravação ('+(e.message||e)+').'); return; }
+    cb.ok(g);
+  }).catch(function(e){ if(acabou) return; acabou=true; clearTimeout(timer); cb.erro(msgErroMic(e)); });
+}
+function gravParar(g, fn){
+  if(!g) return;
+  if(fn){ if(g.parado && g.blob) { fn(g.blob); return; } g._cbs.push(fn); }
+  if(!g.parado && g.mr.state!=='inactive'){ g.fimT=Date.now(); try{ g.mr.stop(); }catch(e){ g.parado=true; g.blob=new Blob(g.chunks,{type:g.mime}); var l=g._cbs; g._cbs=[]; l.forEach(function(f){ f(g.blob); }); } }
+}
+function gravAtivo(g){ return !!(g && !g.parado && g.mr.state!=='inactive'); }
+/** No iOS, o "click" pode falhar em alguns WebViews: trata o toque (touchend) e o clique, sem disparar duas vezes. */
+function onTap(el, fn){
+  var ultimo=0;
+  el.addEventListener('touchend', function(ev){ ev.preventDefault(); ultimo=Date.now(); fn(ev); }, { passive:false });
+  el.addEventListener('click', function(ev){ if(Date.now()-ultimo<700) return; fn(ev); });
+}
+
 function recStart(){
   auErr('');
-  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder){ auErr('Este navegador não grava áudio. Use "Anexar áudio".'); return; }
-  var mime=pickRecMime();
-  navigator.mediaDevices.getUserMedia({ audio:{ echoCancellation:true, noiseSuppression:true } }).then(function(stream){
-    Rec.stream=stream; Rec.chunks=[];
-    var o={ audioBitsPerSecond:32000 }; if(mime) o.mimeType=mime;
-    var mr; try{ mr=new MediaRecorder(stream, o); }catch(e){ mr=new MediaRecorder(stream); }
-    Rec.mr=mr;
-    mr.ondataavailable=function(ev){ if(ev.data && ev.data.size) Rec.chunks.push(ev.data); };
-    mr.onstop=function(){
-      var type=mr.mimeType||mime||'audio/webm', blob=new Blob(Rec.chunks,{type:type}), fimT=new Date();
-      stopTracks();
-      if(!state.audio) return;
-      setAudioBlob(blob, 'gravacao.'+extDoMime(type), type);
-      state.audio.dur=(fimT.getTime()-Rec.t0)/1000;
-      $('au-ini').value=toLocalInput(new Date(Rec.t0)); $('au-fim').value=toLocalInput(fimT);
-      $('au-rstat').textContent='Gravado ('+mb(blob.size)+'). Ouça abaixo ou grave de novo.';
-      if(blob.size > AUDIO_MAX) auErr('Gravação de '+mb(blob.size)+': passa do limite de '+mb(AUDIO_MAX)+'.');
-      else if(blob.size > AUDIO_AVISO) auErr('Gravação grande ('+mb(blob.size)+'): o envio pode demorar. Prefira Wi-Fi.');
-    };
-    mr.onerror=function(ev){ auErr('A gravação falhou: '+((ev.error&&ev.error.message)||'erro')); recStop(); };
-    Rec.t0=Date.now(); mr.start(1000);
-    $('au-recbtn').classList.add('on'); $('au-rstat').textContent='Gravando… toque para parar';
-    $('au-player').hidden=true; keepAwake(true);
-    clearInterval(Rec.tick); Rec.tick=setInterval(function(){ $('au-timer').textContent=mmss(Date.now()-Rec.t0); }, 500);
-  }).catch(function(e){
-    auErr(e && e.name==='NotAllowedError' ? 'Sem permissão de microfone. Libere o microfone para este site nas configurações do navegador.'
-      : 'Não consegui abrir o microfone ('+((e&&e.message)||e)+'). Se o celular está em ligação, o microfone fica com a ligação.');
+  var a=state.audio; if(!a) return;
+  $('au-rstat').textContent='Abrindo o microfone…';
+  micGravar({
+    ok:function(g){
+      if(!state.audio){ gravParar(g); return; }
+      Rec.g=g;
+      $('au-recbtn').classList.add('on'); $('au-rstat').textContent='Gravando… toque para parar';
+      $('au-player').hidden=true; keepAwake(true);
+      clearInterval(Rec.tick); Rec.tick=setInterval(function(){ $('au-timer').textContent=mmss(Date.now()-g.t0); }, 500);
+      g._cbs.push(function(blob){ recPronto(g, blob); });
+    },
+    erro:function(msg){ $('au-rstat').textContent='Toque para gravar'; auErr(msg); },
+    interrompido:function(motivo, g){ if(Rec.g===g) auErr('A gravação parou sozinha ('+motivo+'). O que foi gravado até aqui ficou salvo: ouça abaixo e envie, ou grave de novo.'); }
   });
 }
-function stopTracks(){ if(Rec.stream){ Rec.stream.getTracks().forEach(function(t){ try{ t.stop(); }catch(e){} }); Rec.stream=null; } }
-function recStop(){
+function recPronto(g, blob){
   clearInterval(Rec.tick); keepAwake(false); $('au-recbtn').classList.remove('on');
-  if(Rec.mr && Rec.mr.state!=='inactive'){ try{ Rec.mr.stop(); }catch(e){ stopTracks(); } } else stopTracks();
-  Rec.mr=null;
+  if(!state.audio || Rec.g!==g) return;
+  if(!blob.size){ $('au-rstat').textContent='Nada foi gravado. Toque para gravar de novo.'; auErr(isIOS?'O iPhone não entregou áudio. Verifique a permissão do microfone ou abra no Safari.':'Nada foi gravado. Tente de novo.'); return; }
+  setAudioBlob(blob, 'gravacao.'+extDoMime(g.mime), g.mime);
+  state.audio.dur=(g.fimT-g.t0)/1000;
+  $('au-timer').textContent=mmss(g.fimT-g.t0);
+  $('au-ini').value=toLocalInput(new Date(g.t0)); $('au-fim').value=toLocalInput(new Date(g.fimT));
+  $('au-rstat').textContent='Gravado ('+mb(blob.size)+'). Ouça abaixo ou grave de novo.';
+  if(blob.size > AUDIO_MAX) auErr('Gravação de '+mb(blob.size)+': passa do limite de '+mb(AUDIO_MAX)+'.');
+  else if(blob.size > AUDIO_AVISO) auErr('Gravação grande ('+mb(blob.size)+'): o envio pode demorar. Prefira Wi-Fi.');
 }
-function recording(){ return !!(Rec.mr && Rec.mr.state==='recording'); }
+function recStop(){ clearInterval(Rec.tick); keepAwake(false); $('au-recbtn').classList.remove('on'); if(Rec.g) gravParar(Rec.g); }
+function recording(){ return gravAtivo(Rec.g); }
 function audioMeta(a){
   return { id:a.id, lead_id:a.lead_id, lead_nome:a.lead_nome, origem:a.modo==='gravado'?'audio_gravado':'audio_anexo', tipo:a.tipo,
     hora_inicio:fromLocalInput($('au-ini').value), hora_fim:fromLocalInput($('au-fim').value), notas:$('au-notas').value, transcricao:'' };
@@ -714,13 +1021,26 @@ function flushAudioBox(){
 /* ---------- eventos ---------- */
 $('cfg-save').onclick=saveCfg;
 $('q').addEventListener('input', renderList);
-$('list').addEventListener('click', function(ev){ var b=ev.target.closest('.lead'); if(b) selectLead(b.getAttribute('data-id')); });
+$('list').addEventListener('click', function(ev){
+  var m=ev.target.closest('.more'); if(m){ var e=m.getAttribute('data-etapa'); state.kcap[e]=(state.kcap[e]||KCAP)+KCAP; var sl=$('list').scrollLeft; renderList(); $('list').scrollLeft=sl; return; }
+  var b=ev.target.closest('.lead'); if(b) selectLead(b.getAttribute('data-id'));
+});
 $('btn-start').onclick=function(){ if(state.sel) openCall(false); };
+$('btn-dial').onclick=openDial;
+$('dial-num').addEventListener('input', function(){ dialHref(); dialErr(''); });
+$('dial-chips').addEventListener('click', function(ev){ var b=ev.target.closest('button'); if(b){ $('dial-num').value=b.getAttribute('data-tel'); dialHref(); } });
+$('dial-rec').addEventListener('click', dialRecToggle);
+$('dial-go').addEventListener('click', dialGo);
+$('dial-cancel').onclick=function(){ closeDial(true); }; $('dial-bg').onclick=function(){ closeDial(true); };
+$('btn-view').onclick=function(){ state.view = state.view==='kanban' ? 'lista' : 'kanban'; LS.set('view', state.view); renderList(); };
+$('kchips').addEventListener('click', function(ev){ var b=ev.target.closest('.kchip'); if(!b) return; var col=$('list').querySelectorAll('.kcol')[+b.getAttribute('data-col')]; if(col) $('list').scrollTo({ left: col.offsetLeft - 14, behavior:'smooth' }); });
+$('cfg-link').addEventListener('keydown', function(ev){ if(ev.key==='Enter') saveCfg(); });
+$('cfg-paste').onclick=function(){ navigator.clipboard.readText().then(function(t){ $('cfg-link').value=t||''; if(cfgDeTexto(t)) saveCfg(); }).catch(function(){ toast('Não consegui colar. Toque e segure no campo > Colar.'); }); };
 $('btn-rec').onclick=function(){ if(state.sel) openAudio('gravado'); };
 $('btn-attach').onclick=function(){ if(!state.sel) return; openAudio('anexo'); $('file-audio').value=''; $('file-audio').click(); };
 $('au-change').onclick=function(){ $('file-audio').value=''; $('file-audio').click(); };
 $('file-audio').addEventListener('change', function(){ onFilePicked(this.files && this.files[0]); });
-$('au-recbtn').onclick=function(){ recording() ? recStop() : recStart(); };
+onTap($('au-recbtn'), function(){ recording() ? recStop() : recStart(); });
 $('au-tipo').addEventListener('click', function(ev){ var b=ev.target.closest('button'); if(!b||!state.audio) return; state.audio.tipo=b.getAttribute('data-v');
   document.querySelectorAll('#au-tipo button').forEach(function(x){ x.classList.toggle('on', x===b); }); });
 $('au-send').onclick=sendAudio;
@@ -732,32 +1052,44 @@ $('btn-end').onclick=endCall;
 $('notas').addEventListener('input', function(){ if(state.call){ state.call.notas=this.value; draft(); } });
 $('call-back').onclick=function(){
   if(state.call && (state.call.transcricao || state.call.notas) && !confirm('Sair e descartar esta ligação?')) return;
-  pauseCall(); state.call=null; LS.del('draft'); show('s-list');
+  pauseCall(); descartarGravacao(); state.call=null; LS.del('draft'); show('s-list');
 };
 $('rev-back').onclick=function(){ openCall(true); };
 $('btn-send').onclick=send;
-$('btn-discard').onclick=function(){ if(confirm('Descartar esta ligação? O texto será apagado.')){ state.call=null; LS.del('draft'); show('s-list'); renderList(); } };
+$('btn-discard').onclick=function(){ if(confirm('Descartar esta ligação? O texto será apagado.')){ descartarGravacao(); state.call=null; LS.del('draft'); show('s-list'); renderList(); } };
 $('btn-new').onclick=function(){ $('done-txt').textContent='O bot lança a ata no Lupe em até 30 min.'; $('q').value=''; show('s-list'); renderList(); loadLeads(true); };
 $('btn-hist').onclick=function(){ show('s-hist'); loadHist(); };
 $('hist-back').onclick=function(){ show('s-list'); };
-$('btn-reset').onclick=function(){ if(confirm('Apagar a configuração deste aparelho?')){ LS.del('cfg'); boot(); } };
+$('btn-reset').onclick=function(){ if(confirm('Apagar a configuração deste aparelho?')){ LS.del('cfg'); try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){} boot(); } };
 window.addEventListener('online', flushOutbox);
 document.addEventListener('visibilitychange', function(){
   // ao voltar para o app (ex.: depois de atender/desligar), retoma a transcrição se ela estava ligada
-  if(document.visibilityState==='visible' && state.call && state.call.running && !Engine.want){ Engine.start(); }
+  if(document.visibilityState!=='visible') return;
+  if(state.call && state.call.running && state.call.modo==='voz' && SR && !Engine.want){ Engine.start(); }
+  // alguns iOS não avisam o corte do microfone: confere ao voltar para o app
+  [state.callGrav, state.dialGrav, Rec.g].forEach(function(g){
+    if(gravAtivo(g) && g.stream.getAudioTracks().some(function(t){ return t.readyState==='ended' || t.muted; })){ g.interrompido=g.interrompido||'microfone cortado pelo sistema'; gravParar(g); }
+  });
 });
 
 /* ---------- início ---------- */
 function boot(){
   readHash();
-  if(!cfg()){ show('s-config'); return; }
+  if(!cfg()){
+    if(isIOS && standalone) $('cfg-intro').innerHTML='No iPhone, o ícone da tela de início tem memória separada do Safari. <b>Cole o link do app</b> abaixo uma vez (copie do e-mail), ou apague o ícone e crie de novo pelo <b>Safari</b> a partir do link.';
+    else if(inApp) $('cfg-intro').innerHTML='Abra o <b>link do app</b> que você recebeu, de preferência no <b>Safari</b>/Chrome. Ou cole o link inteiro abaixo.';
+    $('cfg-paste').hidden = !(navigator.clipboard && navigator.clipboard.readText);
+    show('s-config'); return;
+  }
+  hashDaCfg();
+  renderBanner('banner-list', false);
   var d=LS.get('draft',null);
   if(d){ state.call=d; d.running=false; state.sel={lead_id:d.lead_id}; toast('Rascunho recuperado.'); endCall(); return; }
   show('s-list'); renderList(); loadLeads(state.leads.length>0); flushOutbox();
-  api('ping').then(function(j){ if(j.vendedor) $('who').textContent=j.vendedor; }).catch(function(){});
+  api('ping').then(function(j){ if(j.vendedor) $('who').textContent=j.vendedor; state.srv={ versao:j.versao||1, audio_na_ligacao:!!j.audio_na_ligacao }; LS.set('srv', state.srv); }).catch(function(){});
 }
 if('serviceWorker' in navigator && location.protocol==='https:') navigator.serviceWorker.register('sw.js').catch(function(){});
-window.__ata = { state: state, Engine: Engine, AudioBox: AudioBox };
+window.__ata = { state: state, Engine: Engine, AudioBox: AudioBox, pickRecMime: pickRecMime };
 boot();
 })();
 </script>
