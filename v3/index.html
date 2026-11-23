@@ -1,0 +1,1238 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#006058">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ata Lupe">
+<meta name="referrer" content="no-referrer">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>Ata de ligações</title>
+<style>
+:root{
+  --brand:#006058; --brand-2:#0a7d72; --brand-soft:#e6f2f0; --accent:#ffb507;
+  --bg:#f4f6f6; --card:#fff; --text:#13201f; --muted:#5f6f6d; --line:#e2e8e7;
+  --danger:#c62828; --ok:#1b8a4b; --radius:16px;
+  --safe-top:env(safe-area-inset-top,0px); --safe-bot:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text);
+  font:16px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+button{font:inherit;border:0;cursor:pointer}
+.screen{display:none;min-height:100%;flex-direction:column}
+.screen.on{display:flex}
+header.top{position:sticky;top:0;z-index:5;background:var(--brand);color:#fff;
+  padding:calc(14px + var(--safe-top)) 18px 14px;display:flex;align-items:center;gap:12px}
+header.top h1{font-size:20px;margin:0;font-weight:700;flex:1;letter-spacing:-.2px}
+header.top .sub{font-size:12px;opacity:.8;font-weight:500;display:block}
+.iconbtn{width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.14);color:#fff;
+  display:grid;place-items:center}
+.iconbtn svg{width:22px;height:22px}
+.searchwrap{background:var(--brand);padding:0 16px 16px;position:sticky;top:calc(68px + var(--safe-top));z-index:4}
+.search{display:flex;align-items:center;gap:8px;background:#fff;border-radius:14px;padding:0 14px;height:48px;
+  box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.search input{flex:1;border:0;outline:0;font-size:16px;background:transparent;color:var(--text)}
+.search svg{width:20px;height:20px;color:var(--muted)}
+.meta{display:flex;justify-content:space-between;align-items:center;padding:12px 18px 4px;color:var(--muted);font-size:13px}
+.meta button{background:none;color:var(--brand);font-weight:600;font-size:13px;padding:6px 0}
+.list{padding:6px 14px calc(190px + var(--safe-bot));display:flex;flex-direction:column;gap:10px}
+.lead{background:var(--card);border-radius:var(--radius);padding:14px 16px;border:2px solid transparent;
+  box-shadow:0 1px 3px rgba(16,40,38,.06);text-align:left;width:100%;color:var(--text)}
+.lead.sel{border-color:var(--brand);background:var(--brand-soft)}
+.lead .nm{font-weight:700;font-size:16px;line-height:1.25}
+.lead .rs{color:var(--muted);font-size:13px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lead .row{display:flex;flex-wrap:wrap;gap:6px 10px;margin-top:8px;align-items:center;font-size:12px;color:var(--muted)}
+.pill{display:inline-block;padding:3px 9px;border-radius:999px;font-weight:600;font-size:12px;background:#eef1f1;color:#36504d}
+.pill.etapa{background:#fff4d6;color:#7a5600}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.empty{text-align:center;color:var(--muted);padding:40px 20px}
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:6;background:#fff;border-top:1px solid var(--line);
+  padding:12px 16px calc(12px + var(--safe-bot));box-shadow:0 -6px 24px rgba(0,0,0,.06);transform:translateY(110%);transition:transform .2s}
+.bar.on{transform:none}
+.bar .who{font-size:13px;color:var(--muted);margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar .who b{color:var(--text)}
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:54px;border-radius:14px;
+  font-weight:700;font-size:17px;background:var(--brand);color:#fff}
+.btn:active{filter:brightness(.92)}
+.btn[disabled]{opacity:.5}
+.btn.ghost{background:#eef2f1;color:var(--text)}
+.btn.red{background:var(--danger)}
+.btn.amber{background:var(--accent);color:#2b1d00}
+.btn svg{width:22px;height:22px}
+.row2{display:flex;gap:10px}
+.row2 .btn{flex:1}
+.call-head{background:var(--brand);color:#fff;padding:calc(12px + var(--safe-top)) 18px 22px}
+.call-head .back{background:none;color:#fff;opacity:.85;padding:6px 0;font-size:15px;display:flex;align-items:center;gap:4px}
+.call-head .nm{font-size:22px;font-weight:800;margin-top:6px;line-height:1.2}
+.call-head .info{font-size:13px;opacity:.85;margin-top:4px}
+.status{display:flex;align-items:center;gap:10px;margin-top:16px}
+.dot{width:12px;height:12px;border-radius:50%;background:#9fb9b5}
+.dot.live{background:#ff5a5a;box-shadow:0 0 0 0 rgba(255,90,90,.7);animation:pulse 1.4s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 12px rgba(255,90,90,0)}100%{box-shadow:0 0 0 0 rgba(255,90,90,0)}}
+.timer{font-variant-numeric:tabular-nums;font-weight:700;font-size:28px;margin-left:auto}
+.stxt{font-size:14px;font-weight:600}
+.body{padding:16px 16px calc(150px + var(--safe-bot));display:flex;flex-direction:column;gap:14px}
+.card{background:#fff;border-radius:var(--radius);padding:14px 16px;box-shadow:0 1px 3px rgba(16,40,38,.06)}
+.card h3{margin:0 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted)}
+.tx{min-height:180px;max-height:46vh;overflow:auto;white-space:pre-wrap;font-size:15px;line-height:1.5}
+.tx .interim{color:#8aa09d}
+.tx .ph{color:#9aaaa8}
+textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px;font:inherit;font-size:15px;
+  resize:vertical;min-height:90px;outline:0;background:#fbfcfc;color:var(--text)}
+textarea:focus{border-color:var(--brand)}
+textarea.big{min-height:260px}
+.note{font-size:13px;color:#6b4e00;background:#fff6dc;border-radius:12px;padding:10px 12px;line-height:1.45}
+.note.err{color:#7f1d1d;background:#fde8e8}
+.foot{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);
+  padding:12px 16px calc(12px + var(--safe-bot));display:flex;flex-direction:column;gap:10px;z-index:6}
+.center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center;gap:14px}
+.big-ok{width:84px;height:84px;border-radius:50%;background:var(--brand-soft);color:var(--brand);display:grid;place-items:center}
+.big-ok svg{width:44px;height:44px}
+label.f{display:block;font-size:13px;color:var(--muted);font-weight:600;margin:14px 0 6px}
+input.f{width:100%;height:48px;border:1px solid var(--line);border-radius:12px;padding:0 12px;font:inherit;font-size:15px;background:#fff}
+.toast{position:fixed;left:50%;top:calc(16px + var(--safe-top));transform:translate(-50%,-150%);background:#13201f;color:#fff;
+  padding:10px 16px;border-radius:12px;font-size:14px;z-index:50;transition:transform .25s;max-width:90vw}
+.toast.on{transform:translate(-50%,0)}
+.hist{padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.hist .it{background:#fff;border-radius:12px;padding:12px 14px;font-size:14px}
+.st-Lançada{background:#e3f4ea;color:var(--ok)} .st-Pendente{background:#fff4d6;color:#7a5600} .st-Erro{background:#fde8e8;color:var(--danger)}
+.spin{width:22px;height:22px;border:3px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:sp 0.8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.bar .row2{margin-top:10px}
+.bar .row2 .btn{height:50px;font-size:15px}
+.seg{display:flex;gap:8px}
+.seg button{flex:1;height:48px;border-radius:12px;background:#eef2f1;color:var(--text);font-weight:700;font-size:15px;border:2px solid transparent}
+.seg button.on{background:var(--brand-soft);border-color:var(--brand);color:var(--brand)}
+.two{display:flex;gap:10px}.two>div{flex:1;min-width:0}
+.two label.f{margin-top:0}
+@media (max-width:560px){.two{flex-direction:column;gap:12px}}
+audio{margin-top:0}
+input.f[type=datetime-local]{padding:0 8px;font-size:15px;-webkit-appearance:none;appearance:none;min-width:0}
+.rec{display:flex;flex-direction:column;align-items:center;gap:12px;padding:8px 0}
+.recbtn{width:96px;height:96px;border-radius:50%;background:var(--danger);color:#fff;display:grid;place-items:center;box-shadow:0 6px 18px rgba(198,40,40,.35)}
+.recbtn svg{width:40px;height:40px}
+.recbtn.on{background:#13201f;box-shadow:0 0 0 0 rgba(255,90,90,.7);animation:pulse 1.4s infinite}
+.rec .timer{margin:0;font-size:34px;color:var(--text)}
+.filebox{display:flex;align-items:center;gap:12px}
+.filebox .nm{font-weight:700;word-break:break-all}
+.filebox .sub{color:var(--muted);font-size:13px}
+audio{width:100%}
+.tag{font-size:11px;font-weight:700;color:var(--muted);margin-left:6px}
+/* kanban */
+.kb{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:6px 14px calc(230px + var(--safe-bot));align-items:flex-start;overscroll-behavior-x:contain}
+.kcol{flex:0 0 84%;max-width:340px;scroll-snap-align:start;scroll-margin-left:14px;background:#e8eeed;border-radius:16px;padding:10px;display:flex;flex-direction:column;gap:8px}
+.kcol>h4{margin:2px 4px 2px;font-size:14px;display:flex;align-items:center;gap:8px;color:#24403d}
+.kcol>h4 .n{margin-left:auto;background:#fff;border-radius:999px;padding:2px 9px;font-size:12px;color:var(--muted)}
+.kcol>h4 i{width:10px;height:10px;border-radius:50%;background:var(--kc,#9fb9b5);flex:0 0 auto}
+.kcol .lead{padding:12px 14px}
+.kcol .vazio{color:var(--muted);font-size:13px;text-align:center;padding:14px 4px}
+.kcol .more{background:#fff;color:var(--brand);font-weight:700;border-radius:12px;height:42px;font-size:14px}
+.kchips{display:flex;gap:8px;overflow-x:auto;padding:8px 14px 4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.kchips::-webkit-scrollbar{display:none}
+.kchip{flex:0 0 auto;background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 12px;font-size:13px;font-weight:600;color:#24403d;white-space:nowrap}
+.kchip b{color:var(--muted);font-weight:700;margin-left:4px}
+.meta .vt{background:#fff;border:1px solid var(--line);border-radius:10px;padding:5px 10px;color:var(--brand);font-weight:700;font-size:13px;margin-left:10px}
+/* discador */
+.dialer{position:fixed;inset:0;z-index:21;background:#fff;display:flex;flex-direction:column;align-items:center;
+  padding:calc(10px + var(--safe-top)) 18px calc(14px + var(--safe-bot));transform:translateY(105%);transition:transform .22s;overflow-y:auto}
+.dialer.on{transform:none}
+.d-top{width:100%;max-width:420px;display:flex;align-items:center;gap:8px}
+.d-x{background:none;color:var(--brand);font-weight:600;font-size:16px;padding:8px 2px;min-width:72px;text-align:left}
+#dial-paste{text-align:right}
+.d-lead{flex:1;text-align:center;min-width:0;display:flex;flex-direction:column}
+.d-lead span{font-size:12px;color:var(--muted)}
+.d-lead b{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dialer .chips{justify-content:center;min-height:8px;max-width:420px}
+.d-num{width:100%;max-width:420px;margin-top:clamp(6px,3vh,28px)}
+.d-num input{width:100%;border:0;outline:0;background:transparent;text-align:center;font-size:clamp(28px,9vw,40px);font-weight:400;
+  letter-spacing:.5px;color:var(--text);font-variant-numeric:tabular-nums;caret-color:var(--brand);padding:0}
+.d-num input::placeholder{color:#b8c4c2;font-size:22px}
+.d-fmt{font-size:13px;color:var(--muted);min-height:18px;margin-bottom:clamp(4px,2vh,18px)}
+.dialer .note.err{max-width:420px;width:100%;margin-bottom:8px}
+.keypad{display:grid;grid-template-columns:repeat(3,auto);gap:clamp(10px,2.2vh,18px) clamp(22px,8vw,34px);justify-content:center}
+.key{width:clamp(66px,19vw,80px);height:clamp(66px,19vw,80px);border-radius:50%;background:#e9eceb;color:#111;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;line-height:1;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.key:active,.key.press{background:#c9cfcd}
+.key b{font-size:clamp(28px,8.5vw,36px);font-weight:400}
+.key small{font-size:10px;font-weight:700;letter-spacing:2px;margin-top:2px;color:#333}
+.key[data-k="*"] b{font-size:40px;margin-top:10px}
+.d-call{display:grid;grid-template-columns:repeat(3,clamp(66px,19vw,80px));gap:clamp(22px,8vw,34px);justify-content:center;align-items:center;margin-top:clamp(10px,2.2vh,18px)}
+.callbtn{width:clamp(66px,19vw,80px);height:clamp(66px,19vw,80px);border-radius:50%;background:#34c759;color:#fff;display:grid;place-items:center;
+  box-shadow:0 6px 18px rgba(52,199,89,.35);text-decoration:none}
+.callbtn:active{filter:brightness(.9)}
+.callbtn svg{width:34px;height:34px}
+.d-del{background:none;color:#555;display:grid;place-items:center;height:60px;visibility:hidden}
+.d-del.on{visibility:visible}
+.d-del svg{width:30px;height:30px}
+.dialer .sw{width:100%;max-width:420px}
+/* avisos (navegador de app, tela de início) */
+.banner{margin:10px 14px 0;background:#fff6dc;color:#5c4200;border-radius:14px;padding:12px 14px;font-size:14px;line-height:1.4}
+.banner .acts{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.banner .acts a,.banner .acts button{background:#fff;color:var(--brand);font-weight:700;border-radius:10px;padding:8px 12px;font-size:14px;text-decoration:none;border:1px solid #f0dfaa}
+.banner .x{float:right;background:none;color:#5c4200;font-size:18px;line-height:1;padding:0 0 0 8px}
+/* folha "Ligar" */
+.sheet-bg{position:fixed;inset:0;background:rgba(10,20,19,.45);z-index:20;display:none}
+.sheet-bg.on{display:block}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;background:#fff;border-radius:20px 20px 0 0;padding:18px 16px calc(16px + var(--safe-bot));transform:translateY(110%);transition:transform .2s;max-height:92vh;overflow:auto}
+.sheet.on{transform:none}
+.sheet h2{margin:0 0 2px;font-size:19px}
+.sheet .sub{color:var(--muted);font-size:13px;margin-bottom:6px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.chips button{background:var(--brand-soft);color:var(--brand);font-weight:700;border-radius:999px;padding:8px 12px;font-size:14px}
+.sw{display:flex;gap:12px;align-items:flex-start;margin-top:14px;padding:12px;border-radius:12px;background:#f4f7f6}
+.sw input{width:22px;height:22px;margin:2px 0 0;accent-color:var(--brand);flex:0 0 auto}
+.sw label{font-weight:700;font-size:15px}
+.sw .h{font-size:12.5px;color:var(--muted);margin-top:3px;font-weight:400}
+a.btn{text-decoration:none}
+</style>
+</head>
+<body>
+
+<!-- ===================== CONFIGURAÇÃO ===================== -->
+<section class="screen" id="s-config">
+  <header class="top"><h1>Entrar<span class="sub">Com o seu login do Lupe</span></h1></header>
+  <div class="body">
+    <div class="card" id="cfg-link-card">
+      <p style="margin:0 0 4px" id="cfg-intro">Abra o <b>link do app</b> que você recebeu. Ou cole o link inteiro abaixo.</p>
+      <label class="f" for="cfg-link">Link do app</label>
+      <input class="f" id="cfg-link" inputmode="url" autocomplete="off" placeholder="https://davimorgado-arch.github.io/ata-ligacoes/#api=…">
+      <button class="btn ghost" id="cfg-paste" style="margin-top:10px;height:46px" hidden>Colar link copiado</button>
+    </div>
+    <div class="card">
+      <label class="f" for="cfg-email">E-mail do Lupe</label>
+      <input class="f" id="cfg-email" type="email" inputmode="email" autocomplete="username" placeholder="voce@ludfor.com.br">
+      <label class="f" for="cfg-senha">Senha do Lupe</label>
+      <input class="f" id="cfg-senha" type="password" autocomplete="current-password">
+      <div class="sub" style="color:var(--muted);font-size:13px;margin-top:8px">A senha não fica guardada: serve só para conectar este aparelho ao seu Lupe. As atividades entram no Lupe no seu nome.</div>
+    </div>
+    <div class="note err" id="cfg-err" hidden></div>
+    <button class="btn" id="cfg-save">Entrar</button>
+  </div>
+</section>
+
+<!-- ===================== LISTA DE LEADS ===================== -->
+<section class="screen" id="s-list">
+  <header class="top">
+    <h1>Ligações<span class="sub" id="who">Meu funil no Lupe</span></h1>
+    <button class="iconbtn" id="btn-hist" aria-label="Envios"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/><path d="M12 7v5l3 2"/></svg></button>
+    <button class="iconbtn" id="btn-reload" aria-label="Atualizar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></svg></button>
+  </header>
+  <div class="searchwrap">
+    <div class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="Buscar por empresa, CNPJ ou ID" autocomplete="off" enterkeyhint="search">
+    </div>
+  </div>
+  <div id="banner-list"></div>
+  <div class="meta"><span id="count">Carregando…</span><span style="display:flex;align-items:center"><span id="upd"></span><button class="vt" id="btn-view">Lista</button></span></div>
+  <div class="kchips" id="kchips" hidden></div>
+  <div class="list" id="list"></div>
+  <div class="bar" id="bar">
+    <div class="who">Lead escolhido: <b id="bar-nm">—</b></div>
+    <div class="row2" style="margin-top:0">
+      <button class="btn" id="btn-dial"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1Z"/></svg>Ligar</button>
+      <button class="btn ghost" id="btn-start"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.9V21h2v-2.1A7 7 0 0 0 19 12h-2Z"/></svg>Iniciar ligação</button>
+    </div>
+    <div class="row2">
+      <button class="btn ghost" id="btn-rec"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="6"/></svg>Gravar áudio</button>
+      <button class="btn ghost" id="btn-attach"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 11-8.5 8.5a5 5 0 0 1-7-7L14 4a3.5 3.5 0 0 1 5 5l-8.5 8.5a2 2 0 0 1-3-3L15 7"/></svg>Anexar áudio</button>
+    </div>
+    <input type="file" id="file-audio" accept="audio/*,.opus,.ogg,.oga,.m4a,.mp3,.aac,.wav,.webm,.amr,.3gp,.mp4" hidden>
+  </div>
+</section>
+
+<!-- ===================== ÁUDIO (anexar ou gravar) ===================== -->
+<section class="screen" id="s-audio">
+  <header class="top"><button class="iconbtn" id="au-back" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg></button><h1 id="au-title">Áudio<span class="sub" id="au-nm">—</span></h1></header>
+  <div class="body">
+    <div id="banner-audio"></div>
+    <div class="note err" id="au-err" hidden role="alert"></div>
+    <div class="card" id="au-rec-card" hidden>
+      <h3>Gravação</h3>
+      <div class="rec">
+        <button class="recbtn" id="au-recbtn" aria-label="Gravar"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="7"/></svg></button>
+        <div class="timer" id="au-timer">00:00</div>
+        <div class="stxt" id="au-rstat" style="color:var(--muted)">Toque para gravar</div>
+      </div>
+    </div>
+    <div class="card" id="au-file-card" hidden>
+      <h3>Arquivo</h3>
+      <div class="filebox"><div style="flex:1;min-width:0"><div class="nm" id="au-fnm">—</div><div class="sub" id="au-finfo"></div></div>
+        <button class="btn ghost" id="au-change" style="width:auto;height:40px;padding:0 14px;font-size:14px">Trocar</button></div>
+    </div>
+    <audio id="au-player" controls preload="metadata" hidden></audio>
+    <div class="card"><h3>Tipo de atividade no Lupe</h3>
+      <div class="seg" id="au-tipo"><button data-v="Chamada">Chamada</button><button data-v="E-mail">E-mail</button></div>
+    </div>
+    <div class="card"><h3>Horário</h3>
+      <div class="two"><div><label class="f" for="au-ini">Início</label><input class="f" type="datetime-local" id="au-ini"></div>
+        <div><label class="f" for="au-fim">Fim</label><input class="f" type="datetime-local" id="au-fim"></div></div>
+    </div>
+    <div class="card"><h3>Anotações (opcional)</h3><textarea id="au-notas" placeholder="Ex.: decisor é o Carlos, retornar quinta…"></textarea></div>
+    <div class="note" id="au-tip">A IA transcreve o áudio, escreve o resumo e lança no Lupe com o tipo, o horário e a conclusão. Leva cerca de 1 minuto.</div>
+  </div>
+  <div class="foot">
+    <button class="btn" id="au-send">Enviar</button>
+    <button class="btn ghost" id="au-discard">Descartar</button>
+  </div>
+</section>
+
+<!-- ===================== LIGAÇÃO ===================== -->
+<section class="screen" id="s-call">
+  <div class="call-head">
+    <button class="back" id="call-back">‹ Leads</button>
+    <div class="nm" id="call-nm">—</div>
+    <div class="info" id="call-info"></div>
+    <div class="status"><span class="dot" id="dot"></span><span class="stxt" id="stxt">Pronto para ouvir</span><span class="timer" id="timer">00:00</span></div>
+  </div>
+  <div class="body">
+    <div class="note" id="call-tip">Ligação no <b>viva-voz</b>, aparelho perto. Só o texto é guardado; o áudio <b>não é gravado</b>.<br>Se a ligação estiver <b>neste mesmo celular</b>, o sistema pode bloquear o microfone: use outro aparelho (notebook ou tablet) perto do viva-voz, ou dite um resumo logo após desligar.</div>
+    <div class="note err" id="call-err" hidden></div>
+    <div class="card" id="tx-card"><h3>Transcrição ao vivo</h3><div class="tx" id="tx"><span class="ph">A transcrição aparece aqui…</span></div></div>
+    <div class="card"><h3>Anotações</h3><textarea id="notas" placeholder="Ex.: decisor é o Carlos, fatura vence dia 10, retornar quinta…"></textarea></div>
+  </div>
+  <div class="foot">
+    <div class="row2">
+      <button class="btn ghost" id="btn-pause">Pausar</button>
+      <button class="btn red" id="btn-end">Encerrar</button>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== REVISÃO ===================== -->
+<section class="screen" id="s-review">
+  <header class="top"><button class="iconbtn" id="rev-back" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg></button><h1>Revisar<span class="sub" id="rev-nm">—</span></h1></header>
+  <div class="body">
+    <div class="card" id="rev-audio" hidden><h3>Áudio gravado na ligação</h3><audio id="rev-player" controls preload="metadata"></audio>
+      <div class="sub" id="rev-audio-info" style="color:var(--muted);font-size:13px;margin-top:6px"></div></div>
+    <div class="card"><h3>Transcrição (pode editar)</h3><textarea class="big" id="rev-tx"></textarea></div>
+    <div class="card"><h3>Anotações</h3><textarea id="rev-notas"></textarea></div>
+    <div class="card"><h3>Horário da ligação</h3>
+      <div class="two"><div><label class="f" for="rev-ini">Início</label><input class="f" type="datetime-local" id="rev-ini"></div>
+        <div><label class="f" for="rev-fim">Fim</label><input class="f" type="datetime-local" id="rev-fim"></div></div>
+    </div>
+    <div class="note">Vai para o Lupe como <b>Ligacao</b>. A IA escreve a ata a partir deste texto e lança no Lupe na hora. Confira o lead: <b id="rev-lead"></b></div>
+    <div class="note err" id="rev-err" hidden></div>
+  </div>
+  <div class="foot">
+    <button class="btn" id="btn-send">Enviar</button>
+    <button class="btn ghost" id="btn-discard">Descartar</button>
+  </div>
+</section>
+
+<!-- ===================== ENVIADO ===================== -->
+<section class="screen" id="s-done">
+  <div class="center">
+    <div class="big-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></div>
+    <h2 style="margin:0" id="done-h">Lançada no Lupe</h2>
+    <p style="margin:0;color:var(--muted)" id="done-txt"></p>
+    <div class="note" id="done-warn" hidden></div>
+    <button class="btn" id="btn-new" style="max-width:360px">Nova ligação</button>
+  </div>
+</section>
+
+<!-- ===================== ENVIOS ===================== -->
+<section class="screen" id="s-hist">
+  <header class="top"><button class="iconbtn" id="hist-back" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg></button><h1>Últimos envios<span class="sub">Status no Lupe</span></h1></header>
+  <div class="hist" id="hist"></div>
+  <div style="padding:8px 16px 30px"><button class="btn ghost" id="btn-reset">Sair (trocar de usuário)</button></div>
+</section>
+
+<!-- ===================== LIGAR (discador no estilo do telefone) ===================== -->
+<div class="sheet-bg" id="dial-bg"></div>
+<div class="dialer" id="dial" role="dialog" aria-modal="true" aria-labelledby="dial-t">
+  <div class="d-top">
+    <button class="d-x" id="dial-cancel" aria-label="Fechar">Cancelar</button>
+    <div class="d-lead"><span id="dial-t">Ligar</span><b id="dial-nm">—</b></div>
+    <button class="d-x" id="dial-paste" aria-label="Colar número">Colar</button>
+  </div>
+  <div class="chips" id="dial-chips"></div>
+  <div class="d-num"><input id="dial-num" type="tel" inputmode="none" autocomplete="off" aria-label="Número" placeholder="Digite o número"></div>
+  <div class="d-fmt" id="dial-fmt">&nbsp;</div>
+  <div class="note err" id="dial-err" hidden></div>
+  <div class="keypad" id="keypad"><button class="key" data-k="1" aria-label="1"><b>1</b><small>&nbsp;</small></button><button class="key" data-k="2" aria-label="2"><b>2</b><small>ABC</small></button><button class="key" data-k="3" aria-label="3"><b>3</b><small>DEF</small></button><button class="key" data-k="4" aria-label="4"><b>4</b><small>GHI</small></button><button class="key" data-k="5" aria-label="5"><b>5</b><small>JKL</small></button><button class="key" data-k="6" aria-label="6"><b>6</b><small>MNO</small></button><button class="key" data-k="7" aria-label="7"><b>7</b><small>PQRS</small></button><button class="key" data-k="8" aria-label="8"><b>8</b><small>TUV</small></button><button class="key" data-k="9" aria-label="9"><b>9</b><small>WXYZ</small></button><button class="key" data-k="*" aria-label="*"><b>*</b><small>&nbsp;</small></button><button class="key" data-k="0" aria-label="0"><b>0</b><small>+</small></button><button class="key" data-k="#" aria-label="#"><b>#</b><small>&nbsp;</small></button></div>
+  <div class="d-call">
+    <span></span>
+    <a class="callbtn" id="dial-go" href="tel:" aria-label="Discar e iniciar"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1Z"/></svg></a>
+    <button class="d-del" id="dial-del" aria-label="Apagar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 5H8l-6 7 6 7h13a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1Z"/><path d="m11 9 6 6m0-6-6 6"/></svg></button>
+  </div>
+  <div class="sw" id="dial-sw" hidden>
+    <input type="checkbox" id="dial-rec">
+    <div><label for="dial-rec">Gravar a ligação no viva-voz</label>
+      <div class="h" id="dial-rec-h"></div></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+var LS = {
+  get: function(k, d){ try{ var v = localStorage.getItem('ata.'+k); return v==null ? d : JSON.parse(v); }catch(e){ return d; } },
+  set: function(k, v){ try{ localStorage.setItem('ata.'+k, JSON.stringify(v)); }catch(e){} },
+  del: function(k){ try{ localStorage.removeItem('ata.'+k); }catch(e){} }
+};
+var $ = function(id){ return document.getElementById(id); };
+var state = { leads: LS.get('leads', []), sel: null, call: null, callGrav: null, callAudio: null, dialGrav: null, audio: null, view: LS.get('view','kanban'), kcap: {}, srv: LS.get('srv', {}) };
+
+/* ---------- utilidades ---------- */
+function show(id){ document.querySelectorAll('.screen').forEach(function(s){ s.classList.toggle('on', s.id===id); }); window.scrollTo(0,0); }
+var toastT;
+function toast(msg){ var t=$('toast'); t.textContent=msg; t.classList.add('on'); clearTimeout(toastT); toastT=setTimeout(function(){ t.classList.remove('on'); }, 2600); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function norm(s){ return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
+function digits(s){ return String(s||'').replace(/\D/g,''); }
+function fmtCnpj(s){ var d=digits(s); return d.length===14 ? d.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/,'$1.$2.$3/$4-$5') : (s||''); }
+function uid(){ return 'L' + Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+function mmss(ms){ var s=Math.floor(ms/1000); return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); }
+function stamp(ms){ return '['+mmss(ms)+'] '; }
+function pad(n){ return String(n).padStart(2,'0'); }
+function toLocalInput(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes()); }
+function fromLocalInput(v){ return v ? String(v).replace('T',' ').slice(0,16) : ''; }
+function mb(n){ n=+n||0; if(n<1024) return n+' bytes'; if(n<1048576) return Math.max(1,Math.round(n/1024))+' KB'; return (n/1048576).toFixed(n<10485760?1:0).replace('.',',')+' MB'; }
+
+/* ---------- API (planilha do vendedor via Apps Script) ---------- */
+/* A config vale na ordem: memória (a que carregou os leads) > endereço (#api=…&t=…) > localStorage.
+   Antes, o envio relia só o localStorage: se o WebKit não devolvesse o item (armazenamento bloqueado/limpo,
+   ou memória separada do ícone), "App não configurado" aparecia mesmo com os leads carregados. */
+var CFG = null;
+function cfgValida(c){ return !!(c && c.api && c.token); }
+function cfg(){
+  if(cfgValida(CFG)) return CFG;
+  var c = cfgDeTexto(location.hash) || LS.get('cfg', null);
+  if(cfgValida(c)){ CFG = c; return c; }
+  return null;
+}
+function setCfg(c){ CFG = c; LS.set('cfg', c); try{ sessionStorage.setItem('ata.cfg', JSON.stringify(c)); }catch(e){} }
+function api(acao, extra){
+  var c = cfg();
+  if(acao==='login') c = { api: apiConhecida(), token: '' };
+  if(!c || !c.api) return Promise.reject(new Error('App não configurado. Abra de novo o link do app.'));
+  var body = Object.assign({ acao: acao, token: c.token }, extra||{});
+  // text/plain evita o "preflight" CORS, que o Apps Script não responde.
+  return fetch(c.api, { method:'POST', body: JSON.stringify(body), headers:{'Content-Type':'text/plain;charset=utf-8'}, redirect:'follow' })
+    .then(function(r){ if(!r.ok) throw new Error('Servidor respondeu '+r.status); return r.json(); })
+    .then(function(j){ if(!j.ok){ if(j.codigo==='login' && acao!=='login'){ setTimeout(function(){ sairDoApp(j.erro); }, 0); } throw new Error(j.erro||'Erro desconhecido'); } return j; });
+}
+
+/* ---------- configuração (link com #api=...&t=...) ---------- */
+function cfgDeTexto(txt){
+  var t=String(txt||'').trim(), i=t.indexOf('#'); if(i===-1) return null;
+  var p=new URLSearchParams(t.slice(i+1));
+  return (p.get('api') && p.get('t')) ? { api:p.get('api'), token:p.get('t') } : null;
+}
+/** URL da API mesmo sem login (o link do app traz só #api=…). */
+function apiDeTexto(txt){
+  var t=String(txt||'').trim(), i=t.indexOf('#'); if(i===-1) return '';
+  return new URLSearchParams(t.slice(i+1)).get('api') || '';
+}
+function apiConhecida(){ return (CFG&&CFG.api) || apiDeTexto(location.hash) || (LS.get('cfg',null)||{}).api || LS.get('apiUrl','') || ''; }
+function sairDoApp(msg){
+  var a=apiConhecida(); CFG=null; LS.del('cfg'); if(a) LS.set('apiUrl', a);
+  try{ sessionStorage.removeItem('ata.cfg'); }catch(e){}
+  try{ history.replaceState(null,'',location.pathname+location.search+(a?'#api='+encodeURIComponent(a):'')); }catch(e){}
+  boot(); if(msg){ var e=$('cfg-err'); e.textContent=msg; e.hidden=false; }
+}
+function readHash(){
+  var c = cfgDeTexto(location.hash);
+  if(!c){ try{ c = JSON.parse(sessionStorage.getItem('ata.cfg')||'null'); }catch(e){ c=null; } if(!cfgValida(c)) c=null; }
+  if(c) setCfg(c);
+}
+/* Mantém a configuração no endereço (#api=…&t=…). No iPhone, o ícone da tela de início guarda o endereço atual
+   e tem memória separada do Safari: assim ele já abre conectado. (O manifest não tem start_url de propósito.) */
+function hashDaCfg(){
+  var c=cfg(); if(!c) return;
+  if(cfgDeTexto(location.hash)) return;
+  try{ history.replaceState(null, '', location.pathname + location.search + '#api=' + encodeURIComponent(c.api) + '&t=' + encodeURIComponent(c.token)); }catch(e){}
+}
+function saveCfg(){
+  var e = $('cfg-err'); e.hidden = true;
+  var link = $('cfg-link').value.trim(), a = link ? apiDeTexto(link) : apiConhecida();
+  if(link && !a){ e.textContent='Esse link não tem a configuração do app (precisa ter "#api=").'; e.hidden=false; return; }
+  if(!/^https:\/\/script\.google(usercontent)?\.com\//.test(a) && !/^https?:\/\/(localhost|127\.0\.0\.1)/.test(a)){ e.textContent='Abra o link do app que você recebeu (ou cole-o acima).'; e.hidden=false; return; }
+  var email=$('cfg-email').value.trim(), senha=$('cfg-senha').value;
+  if(!email || !senha){ e.textContent='Preencha e-mail e senha do Lupe.'; e.hidden=false; return; }
+  LS.set('apiUrl', a); CFG = { api:a, token:'' };
+  var b=$('cfg-save'); b.disabled=true; b.innerHTML='<span class="spin"></span>Entrando…';
+  api('login', { email:email, senha:senha }).then(function(j){
+    $('cfg-senha').value=''; LS.set('email', email);
+    setCfg({ api:a, token:j.token }); state.leads=[]; LS.del('leads');
+    try{ history.replaceState(null,'',location.pathname+location.search); }catch(err){}
+    boot();
+  }).catch(function(err){ CFG=null; e.textContent=err.message; e.hidden=false; })
+    .finally(function(){ b.disabled=false; b.textContent='Entrar'; });
+}
+
+/* ---------- lista ---------- */
+function renderList(){
+  var q = norm($('q').value), qd = digits($('q').value);
+  var leads = state.leads.filter(function(l){
+    if(!q) return true;
+    var hay = norm([l.empresa,l.razao_social,l.etapa,l.lead_id].join(' '));
+    return hay.indexOf(q)!==-1 || (qd.length>=3 && (digits(l.cnpj).indexOf(qd)!==-1 || String(l.lead_id).indexOf(qd)!==-1));
+  });
+  $('count').textContent = leads.length + (leads.length===1?' lead':' leads') + (q ? ' encontrados' : ' no funil');
+  var up = LS.get('leadsAt', null); $('upd').textContent = up ? 'Lista de ' + new Date(up).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '';
+  var kanban = state.view==='kanban';
+  $('btn-view').textContent = kanban ? 'Lista' : 'Kanban';
+  $('list').className = kanban ? 'kb' : 'list';
+  $('kchips').hidden = !kanban || !leads.length;
+  if(!leads.length){
+    $('list').className='list';
+    $('list').innerHTML = '<div class="empty">'+(state.leads.length?'Nenhum lead encontrado para essa busca.':'Nenhum lead aberto encontrado no seu Lupe. Toque em atualizar (↻).')+'</div>';
+    return;
+  }
+  if(kanban) return renderKanban(leads, !!q);
+  var max = 200, html = leads.slice(0,max).map(cardHtml).join('');
+  if(leads.length>max) html += '<div class="empty">Mostrando '+max+' de '+leads.length+'. Refine a busca.</div>';
+  $('list').innerHTML = html;
+}
+function cardHtml(l){
+  var sel = state.sel && state.sel.lead_id===l.lead_id;
+  return '<button class="lead'+(sel?' sel':'')+'" data-id="'+esc(l.lead_id)+'">'+
+    '<div class="nm">'+esc(l.empresa||l.razao_social||'(sem nome)')+'</div>'+
+    (l.razao_social && l.razao_social!==l.empresa ? '<div class="rs">'+esc(l.razao_social)+'</div>' : '')+
+    '<div class="row">'+(state.view!=='kanban' && l.etapa?'<span class="pill etapa">'+esc(l.etapa)+'</span>':'')+
+    '<span class="mono">#'+esc(l.lead_id)+'</span>'+(l.cnpj?'<span class="mono">'+esc(fmtCnpj(l.cnpj))+'</span>':'')+'</div></button>';
+}
+/* Ordem do funil "Ludfor Energia" no Kanban do Lupe. Etapas desconhecidas entram no fim. */
+var ETAPAS = ['Novo Lead','Contato Realizado','Lead Qualificado','Solução Apresentada','Proposta Enviada','Em Negociação','Ganho'];
+var CORES = ['#8aa3a0','#4f8fbf','#2e9e7a','#b98a12','#d0711e','#a05bb5','#1b8a4b'];
+var KCAP = 30;
+function colunas(leads, buscando){
+  var cols = {}, ordem = [];
+  ETAPAS.forEach(function(e){ cols[norm(e)] = { nome:e, itens:[] }; ordem.push(norm(e)); });
+  leads.forEach(function(l){
+    var nome = String(l.etapa||'').trim() || 'Sem etapa', k = norm(nome);
+    if(!cols[k]){ cols[k] = { nome:nome, itens:[], extra:true }; ordem.push(k); }
+    cols[k].itens.push(l);
+  });
+  var fixas = ordem.filter(function(k){ return !cols[k].extra; });
+  var extras = ordem.filter(function(k){ return cols[k].extra; }).sort(function(a,b){ return a==='sem etapa' ? 1 : b==='sem etapa' ? -1 : a.localeCompare(b); });
+  return fixas.concat(extras).map(function(k){ return cols[k]; }).filter(function(c){ return !buscando || c.itens.length; });
+}
+function renderKanban(leads, buscando){
+  var cs = colunas(leads, buscando);
+  state.kcap = state.kcap || {};
+  $('kchips').innerHTML = cs.map(function(c, i){ return '<button class="kchip" data-col="'+i+'">'+esc(c.nome)+'<b>'+c.itens.length+'</b></button>'; }).join('');
+  $('list').innerHTML = cs.map(function(c, i){
+    var cap = state.kcap[c.nome] || KCAP, cor = CORES[ETAPAS.indexOf(c.nome)] || '#9fb9b5';
+    return '<section class="kcol" data-etapa="'+esc(c.nome)+'" style="--kc:'+cor+'"><h4><i></i>'+esc(c.nome)+'<span class="n">'+c.itens.length+'</span></h4>'+
+      (c.itens.length ? c.itens.slice(0, cap).map(cardHtml).join('') : '<div class="vazio">Nenhum lead nesta etapa</div>')+
+      (c.itens.length > cap ? '<button class="more" data-etapa="'+esc(c.nome)+'">Mostrar mais ('+(c.itens.length-cap)+' restantes)</button>' : '')+
+      '</section>';
+  }).join('');
+}
+function loadLeads(silent){
+  if(!silent) $('count').textContent='Atualizando…';
+  return api('leads').then(function(j){
+    state.leads = j.leads || []; LS.set('leads', state.leads);
+    var latest = state.leads.reduce(function(m,l){ return l.atualizado_em && l.atualizado_em>m ? l.atualizado_em : m; }, '');
+    LS.set('leadsAt', latest || null);
+    renderList();
+  }).catch(function(e){ renderList(); toast('Não consegui atualizar: '+e.message); });
+}
+function selectLead(id){
+  var l = state.leads.find(function(x){ return String(x.lead_id)===String(id); });
+  state.sel = (state.sel && state.sel.lead_id===id) ? null : l;
+  $('bar').classList.toggle('on', !!state.sel);
+  if(state.sel) $('bar-nm').textContent = (state.sel.empresa||state.sel.razao_social) + '  #' + state.sel.lead_id;
+  document.querySelectorAll('#list .lead').forEach(function(b){ b.classList.toggle('sel', !!state.sel && b.getAttribute('data-id')===String(state.sel.lead_id)); });
+}
+
+/* ---------- transcrição (Web Speech API, sem gravar áudio) ---------- */
+var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+var isIOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+var standalone = window.navigator.standalone === true || (window.matchMedia && matchMedia('(display-mode: standalone)').matches);
+var UA = navigator.userAgent || '';
+var isSafari = /^((?!chrome|android|crios|fxios|edgios).)*safari/i.test(UA);
+// Navegadores embutidos em apps (Gmail, Instagram, WhatsApp, Facebook…) costumam bloquear o microfone e têm memória separada.
+var inAppName = /FBAN|FBAV|FB_IAB/.test(UA) ? 'Facebook' : /Instagram/.test(UA) ? 'Instagram' : /WhatsApp/i.test(UA) ? 'WhatsApp'
+  : /GSA\//.test(UA) ? 'app do Google' : /LinkedInApp/.test(UA) ? 'LinkedIn' : /Line\//.test(UA) ? 'Line'
+  : (isIOS && !standalone && !/Safari\//.test(UA) && !/CriOS|FxiOS|EdgiOS/.test(UA)) ? 'Gmail (ou outro app)' : '';
+var inApp = !!inAppName;
+function linkSafari(){ return 'x-safari-' + location.href; } // iOS 17+: abre a mesma página no Safari
+function renderBanner(id, foco){
+  var el=$(id); if(!el) return;
+  var h='';
+  if(inApp && isIOS){
+    h='<div class="banner" role="note"><b>Aberto dentro do '+esc(inAppName)+'.</b> Aqui o microfone e o ícone da tela de início não funcionam direito. Abra no <b>Safari</b>: toque em ⋯ (ou no ícone de bússola) > <b>Abrir no Safari</b>.'+
+      '<div class="acts"><a href="'+esc(linkSafari())+'" class="js-safari">Abrir no Safari</a><button class="js-copy">Copiar link</button></div></div>';
+  } else if(inApp){
+    h='<div class="banner" role="note"><b>Aberto dentro do '+esc(inAppName)+'.</b> Para gravar e instalar o app, toque em ⋮ > <b>Abrir no Chrome</b>.<div class="acts"><button class="js-copy">Copiar link</button></div></div>';
+  } else if(isIOS && !standalone && !foco && !LS.get('dicaIcone',false)){
+    h='<div class="banner" role="note"><button class="x js-x" aria-label="Fechar">×</button><b>Dica:</b> para usar como app, toque em <b>Compartilhar</b> (□↑) > <b>Adicionar à Tela de Início</b>. O ícone já abre conectado.</div>';
+  }
+  el.innerHTML=h;
+}
+function copiarLink(){
+  var u=location.href;
+  (navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(u) : Promise.reject())
+    .then(function(){ toast('Link copiado. Cole no Safari.'); })
+    .catch(function(){ window.prompt('Copie o link e cole no Safari:', u); });
+}
+document.addEventListener('click', function(ev){
+  if(ev.target.closest('.js-copy')){ ev.preventDefault(); copiarLink(); }
+  else if(ev.target.closest('.js-x')){ LS.set('dicaIcone', true); ev.target.closest('.banner').remove(); }
+});
+
+var Engine = {
+  rec:null, want:false, fails:0, lastStart:0,
+  start:function(){
+    if(!SR) return false;
+    this.want = true; this.fails = 0; this._spawn(); return true;
+  },
+  _spawn:function(){
+    var self=this, r = new SR();   // nova instância a cada reinício (mais estável no Safari)
+    r.lang='pt-BR'; r.continuous=true; r.interimResults=true; r.maxAlternatives=1;
+    r.onresult=function(ev){
+      var interim='';
+      for(var i=ev.resultIndex;i<ev.results.length;i++){
+        var res=ev.results[i], t=res[0].transcript;
+        if(res.isFinal) onFinal(t); else interim+=t;
+      }
+      onInterim(interim);
+      self.fails=0;
+    };
+    r.onerror=function(ev){
+      if(ev.error==='not-allowed' || ev.error==='service-not-allowed'){ self.want=false; onEngineError(ev.error); }
+      else if(ev.error==='audio-capture'){ self.fails+=2; onEngineWarn('Microfone ocupado ou indisponível (se o celular está em ligação, o microfone fica com a ligação).'); }
+      else if(ev.error!=='no-speech' && ev.error!=='aborted'){ self.fails++; onEngineWarn('Reconectando a transcrição ('+ev.error+')…'); }
+    };
+    r.onend=function(){
+      onInterim('');
+      if(!self.want) return;
+      if(Date.now()-self.lastStart < 1500) self.fails++;
+      if(self.fails>=6){ self.want=false; onEngineError('loop'); return; }
+      setTimeout(function(){ if(self.want) self._spawn(); }, 250 + self.fails*400);
+    };
+    this.rec=r; this.lastStart=Date.now();
+    try{ r.start(); }catch(e){ setTimeout(function(){ if(self.want) self._spawn(); }, 800); }
+  },
+  stop:function(){
+    this.want=false;
+    var r=this.rec; this.rec=null;
+    if(r){ try{ if(isIOS){ try{ r.start(); }catch(e){} } r.stop(); }catch(e){} try{ r.abort(); }catch(e){} }
+  }
+};
+
+var wakeLock=null;
+function keepAwake(on){
+  if(on && 'wakeLock' in navigator){ navigator.wakeLock.request('screen').then(function(w){ wakeLock=w; }).catch(function(){}); }
+  if(!on && wakeLock){ try{ wakeLock.release(); }catch(e){} wakeLock=null; }
+}
+
+function draft(){ LS.set('draft', state.call); }
+function callElapsed(){ var c=state.call; return c.acc + (c.running ? Date.now()-c.since : 0); }
+function onFinal(t){
+  t=t.trim(); if(!t) return;
+  var c=state.call; if(!c) return;
+  c.transcricao += (c.transcricao?'\n':'') + stamp(callElapsed()) + t;
+  draft(); renderTx('');
+}
+function onInterim(t){ renderTx(t); }
+function onEngineWarn(msg){ var e=$('call-err'); e.textContent=msg; e.hidden=false; setTimeout(function(){ if(Engine.want) e.hidden=true; }, 5000); }
+function onEngineError(code){
+  var msg = code==='loop'
+    ? 'A transcrição parou várias vezes seguidas. Verifique se o microfone está livre e toque em Retomar, ou escreva nas anotações.'
+    : 'Sem permissão de microfone/reconhecimento de voz. Libere o microfone para este site nas configurações do navegador'+(isIOS?' e ative Siri e Ditado no iPhone':'')+'.';
+  var e=$('call-err'); e.textContent=msg; e.hidden=false;
+  pauseCall(true);
+}
+function renderTx(interim){
+  var c=state.call, el=$('tx');
+  if(!c) return;
+  if(!c.transcricao && !interim){ el.innerHTML='<span class="ph">'+(c.running?'Ouvindo… fale perto do aparelho.':'A transcrição aparece aqui…')+'</span>'; return; }
+  el.innerHTML = esc(c.transcricao) + (interim ? (c.transcricao?'\n':'')+'<span class="interim">'+esc(interim)+'</span>' : '');
+  el.scrollTop = el.scrollHeight;
+}
+var tick;
+function setRunningUI(){
+  var c=state.call, grav=gravAtivo(state.callGrav);
+  $('dot').classList.toggle('live', c.running);
+  $('stxt').textContent = c.running ? (c.modo==='voz' && SR ? 'Transcrevendo' : grav ? 'Gravando · em ligação' : 'Em ligação') : (c.acc ? 'Pausado' : 'Pronto para ouvir');
+  $('btn-pause').textContent = c.running ? 'Pausar' : (c.acc ? 'Retomar' : 'Começar');
+  clearInterval(tick);
+  if(c.running) tick=setInterval(function(){ $('timer').textContent=mmss(callElapsed()); }, 500);
+  $('timer').textContent=mmss(callElapsed());
+}
+/** opts: { modo:'voz' (transcrição ao vivo, padrão) | 'discado' (Ligar: cronômetro + anotações), telefone, grav } */
+function openCall(resume, opts){
+  var l=state.sel; opts=opts||{};
+  if(!resume){
+    state.call = { id:uid(), lead_id:l.lead_id, lead_nome:(l.empresa||l.razao_social||''), cnpj:l.cnpj||'', etapa:l.etapa||'', transcricao:'', notas:'',
+      acc:0, since:0, running:false, startedAt:Date.now(), endedAt:0, modo:opts.modo||'voz', telefone:opts.telefone||'', gravou:!!opts.grav };
+    state.callGrav = opts.grav || null; state.callAudio = null;
+    if(state.callGrav){ state.callGrav.t0 = state.callGrav.t0 || Date.now(); }
+  }
+  var c=state.call;
+  $('call-nm').textContent=c.lead_nome;
+  $('call-info').textContent='#'+c.lead_id + (c.telefone?' · '+c.telefone:'') + (c.cnpj?' · '+fmtCnpj(c.cnpj):'') + (c.etapa?' · '+c.etapa:'');
+  $('notas').value=c.notas; $('call-err').hidden=true;
+  $('tx-card').hidden = c.modo!=='voz';
+  if(c.modo!=='voz'){
+    $('call-tip').innerHTML = state.callGrav
+      ? '🎙️ <b>Gravando no viva-voz.</b> Se o celular cortar o microfone quando a ligação começar, o que foi gravado fica salvo e você segue pelo cronômetro e pelas anotações. Ao desligar, volte aqui e toque em <b>Encerrar</b>.'
+      : 'Ligação para <b>'+esc(c.telefone||'o lead')+'</b>. O cronômetro marca o início e o fim. Escreva as anotações durante ou logo depois e toque em <b>Encerrar</b> ao desligar.';
+  } else if(!SR){
+    $('call-tip').innerHTML = isIOS && standalone
+      ? 'No iPhone, a transcrição automática não funciona no app da tela de início. Use o <b>microfone do teclado</b> nas anotações, ou abra o link no <b>Safari</b>.'
+      : 'Este navegador não tem transcrição automática. Use o Chrome (Android) ou Safari (iPhone), ou dite pelo microfone do teclado nas anotações.';
+  }
+  show('s-call'); setRunningUI(); renderTx(''); draft();
+  if(!resume) resumeCall();
+}
+function gravInterrompida(g){
+  if(state.callGrav!==g || !state.call) return;
+  var dur=mmss((g.fimT||Date.now())-g.t0);
+  $('call-tip').innerHTML='⚠️ <b>A gravação parou</b> quando o celular passou o microfone para a ligação (comum no iPhone). Os <b>'+dur+'</b> gravados ficam salvos e vão junto. Siga pelo cronômetro e escreva as anotações.';
+  setRunningUI();
+}
+function resumeCall(){
+  var c=state.call; if(c.running) return;
+  $('call-err').hidden=true;
+  c.running=true; c.since=Date.now();
+  var g=state.callGrav; if(gravAtivo(g) && g.mr.state==='paused'){ try{ g.mr.resume(); }catch(e){} }
+  if(c.modo==='voz' && SR) Engine.start(); else if(c.modo==='voz') $('notas').focus();
+  keepAwake(true); setRunningUI(); renderTx(''); draft();
+}
+function pauseCall(){
+  var c=state.call; if(!c || !c.running) { if(c) setRunningUI(); return; }
+  c.acc += Date.now()-c.since; c.running=false;
+  var g=state.callGrav; if(gravAtivo(g) && g.mr.state==='recording' && g.mr.pause){ try{ g.mr.pause(); }catch(e){} }
+  if(c.modo==='voz') Engine.stop();
+  keepAwake(false); setRunningUI(); renderTx(''); draft();
+}
+function endCall(){
+  pauseCall();
+  var c=state.call; c.notas=$('notas').value; c.endedAt=Date.now(); draft();
+  var g=state.callGrav;
+  function revisar(){
+    $('rev-ini').value=c.startedAt?toLocalInput(new Date(c.startedAt)):''; $('rev-fim').value=toLocalInput(new Date(c.endedAt));
+    $('rev-nm').textContent=c.lead_nome; $('rev-lead').textContent=c.lead_nome+' (#'+c.lead_id+')';
+    $('rev-tx').value=c.transcricao; $('rev-notas').value=c.notas; $('rev-err').hidden=true;
+    var a=state.callAudio, p=$('rev-player');
+    $('rev-audio').hidden=!a;
+    if(a){
+      try{ if(p.src) URL.revokeObjectURL(p.src); }catch(e){}
+      p.src=URL.createObjectURL(a.blob);
+      $('rev-audio-info').textContent=mb(a.blob.size)+' · '+mmss(a.dur*1000)+(a.interrompido?' · a gravação parou durante a ligação':'')+
+        (state.srv.audio_na_ligacao?' · vai junto com a ligação; a IA transcreve':' · a planilha ainda não aceita áudio na ligação: só o texto será enviado');
+    }
+    show('s-review');
+  }
+  if(!g) return revisar();
+  var feito=false;
+  var fim=function(blob){ if(feito) return; feito=true; state.callGrav=null;
+    if(blob && blob.size) state.callAudio={ blob:blob, mime:g.mime, nome:'ligacao.'+extDoMime(g.mime), dur:((g.fimT||Date.now())-g.t0)/1000, interrompido:g.interrompido };
+    revisar(); };
+  gravParar(g, fim);
+  setTimeout(function(){ fim(g.blob || new Blob(g.chunks,{type:g.mime})); }, 3000);
+}
+function descartarGravacao(){ if(state.callGrav){ gravParar(state.callGrav); state.callGrav=null; } state.callAudio=null; }
+
+/* ---------- envio (com caixa de saída para reenvio) ---------- */
+function payload(c){ return { id:c.id, lead_id:c.lead_id, lead_nome:c.lead_nome, transcricao:c.transcricao, notas:c.notas,
+  origem:'ligacao', tipo:'Ligacao', hora_inicio:fromLocalInput(c.horaIni), hora_fim:fromLocalInput(c.horaFim), telefone:c.telefone||'' }; }
+function send(){
+  var c=state.call;
+  c.transcricao=$('rev-tx').value; c.notas=$('rev-notas').value; c.horaIni=$('rev-ini').value; c.horaFim=$('rev-fim').value; draft();
+  var a = state.srv.audio_na_ligacao ? state.callAudio : null;
+  if(!a && !c.transcricao.trim() && !c.notas.trim()){ var e=$('rev-err'); e.textContent='Escreva algo na transcrição ou nas anotações antes de enviar.'; e.hidden=false; return; }
+  if(c.horaIni && c.horaFim && c.horaFim<c.horaIni){ var e2=$('rev-err'); e2.textContent='A hora final está antes da inicial.'; e2.hidden=false; return; }
+  var b=$('btn-send'); b.disabled=true; b.innerHTML='<span class="spin"></span>Enviando…';
+  var meta=payload(c);
+  var envio = a ? sendAudioItem(meta, a.blob, a.nome, a.mime) : api('enviar', { ligacao: meta });
+  function limpar(){ LS.del('draft'); state.call=null; state.callAudio=null; state.sel=null; $('bar').classList.remove('on'); }
+  envio.then(function(j){
+    limpar();
+    mostrarResultado(j);
+  }).catch(function(err){
+    var guardar = a
+      ? AudioBox.put({ id:meta.id, meta:meta, blob:a.blob, nome:a.nome, mime:a.mime })
+      : Promise.resolve().then(function(){ var out=LS.get('outbox',[]); if(!out.some(function(x){return x.id===c.id;})) out.push(meta); LS.set('outbox',out); });
+    return guardar.then(function(){
+      limpar();
+      $('done-warn').hidden=false; $('done-warn').textContent='Sem conexão com a planilha ('+err.message+'). A ligação ficou guardada neste aparelho e será reenviada automaticamente.';
+      show('s-done');
+    }).catch(function(){ var e3=$('rev-err'); e3.textContent='Sem conexão ('+err.message+') e não consegui guardar o áudio. Não feche esta tela e toque em Enviar de novo.'; e3.hidden=false; });
+  }).finally(function(){ b.disabled=false; b.textContent='Enviar'; });
+}
+
+/* ---------- Ligar: discador do celular + início da ligação no mesmo toque ---------- */
+function telLimpo(v){ v=String(v||''); var p=v.match(/[+\d*#]/); return (p&&p[0]==='+'?'+':'') + v.replace(/[^\d*#]/g,''); }
+function telHref(v){ return 'tel:' + telLimpo(v).replace(/#/g,'%23'); }
+/** Formata como o telefone do celular: (11) 98765-4321, (11) 4000-1000; o resto fica como digitado. */
+function fmtTel(raw){
+  raw=telLimpo(raw);
+  var br=raw.match(/^\+55(\d{10,11})$/); if(br) return '+55 '+fmtTel(br[1]);
+  if(!raw || /[+*#]/.test(raw) || raw.charAt(0)==='0' || raw.length>11) return raw;
+  if(raw.length<=2) return raw;
+  var ddd=raw.slice(0,2), r=raw.slice(2);
+  if(r.length<=4) return '('+ddd+') '+r;
+  var cut = r.length>=9 ? 5 : r.length-4;
+  return '('+ddd+') '+r.slice(0,cut)+'-'+r.slice(cut);
+}
+function setNum(raw){
+  var v=fmtTel(raw); $('dial-num').value=v; dialHref();
+  $('dial-del').classList.toggle('on', !!telLimpo(v)); dialErr('');
+}
+function telefonesDe(l){
+  var lista=[].concat(l.telefones||[], l.telefone||[]).join(';').split(/[;,|\/]+/), out=[], vistos={};
+  LS.get('tel.'+l.lead_id, []).concat(lista).forEach(function(t){ t=String(t||'').trim(); var k=digits(t); if(k.length>=8 && !vistos[k]){ vistos[k]=1; out.push(t); } });
+  return out;
+}
+function openDial(){
+  var l=state.sel; if(!l) return;
+  if(state.dialGrav){ gravParar(state.dialGrav); state.dialGrav=null; }
+  var tels=telefonesDe(l);
+  $('dial-nm').textContent=(l.empresa||l.razao_social||'')+'  #'+l.lead_id;
+  $('dial-chips').innerHTML=tels.map(function(t){ return '<button data-tel="'+esc(t)+'">'+esc(t)+'</button>'; }).join('');
+  setNum(tels[0]||'');
+  api('telefones', { lead_id:l.lead_id }).then(function(j){
+    if(state.sel!==l || !$('dial').classList.contains('on')) return;
+    var vistos={}; tels.forEach(function(t){ vistos[digits(t)]=1; });
+    var novos=(j.telefones||[]).filter(function(t){ var k=digits(t.numero); if(vistos[k]) return false; vistos[k]=1; return true; });
+    if(!novos.length) return;
+    $('dial-chips').innerHTML += novos.map(function(t){ return '<button data-tel="'+esc(t.numero)+'">'+esc((t.nome?t.nome.split(' ')[0]+': ':'')+fmtTel(t.numero))+'</button>'; }).join('');
+    if(!telLimpo($('dial-num').value)) setNum(novos[0].numero);
+  }).catch(function(){});
+  $('dial-sw').hidden = !state.srv.audio_na_ligacao;
+  $('dial-rec').checked=false; $('dial-rec').disabled=!micDisponivel(); $('dial-err').hidden=true;
+  $('dial-rec-h').textContent = micDisponivel()
+    ? 'Liga o microfone antes de discar. No iPhone, a gravação costuma parar quando a ligação começa neste mesmo aparelho: o que for gravado fica salvo e você segue com o cronômetro e as anotações.'
+    : msgSemMic();
+  $('dial-bg').classList.add('on'); $('dial').classList.add('on');
+}
+function closeDial(descartar){
+  $('dial-bg').classList.remove('on'); $('dial').classList.remove('on');
+  if(descartar && state.dialGrav){ gravParar(state.dialGrav); }
+  state.dialGrav=null;
+}
+function dialHref(){ $('dial-go').setAttribute('href', telHref($('dial-num').value)); }
+function dialKey(k){ setNum(telLimpo($('dial-num').value)+k); if(navigator.vibrate){ try{ navigator.vibrate(8); }catch(e){} } }
+function dialErr(msg){ var e=$('dial-err'); e.textContent=msg||''; e.hidden=!msg; }
+function dialRecToggle(){
+  var cb=$('dial-rec'); dialErr('');
+  if(!cb.checked){ if(state.dialGrav){ gravParar(state.dialGrav); state.dialGrav=null; } $('dial-rec-h').textContent='Gravação desligada.'; return; }
+  $('dial-rec-h').textContent='Abrindo o microfone…';
+  micGravar({
+    ok:function(g){ if(!$('dial').classList.contains('on') || !cb.checked){ gravParar(g); return; } state.dialGrav=g; $('dial-rec-h').innerHTML='🎙️ <b>Gravando.</b> Agora toque no <b>botão verde</b> e ponha no viva-voz.'; },
+    erro:function(msg){ cb.checked=false; $('dial-rec-h').textContent=''; dialErr(msg); },
+    interrompido:function(m, g){ gravInterrompida(g); }
+  });
+}
+function dialGo(ev){
+  var l=state.sel, num=telLimpo($('dial-num').value);
+  if(!l){ ev.preventDefault(); return; }
+  if(digits(num).length<8){ ev.preventDefault(); dialErr('Digite ou cole o telefone (com DDD).'); return; }
+  dialHref();
+  var salvos=LS.get('tel.'+l.lead_id, []), vis=$('dial-num').value.trim();
+  salvos=salvos.filter(function(t){ return digits(t)!==digits(vis); }); salvos.unshift(vis); LS.set('tel.'+l.lead_id, salvos.slice(0,5)); // último discado primeiro
+  var g=state.dialGrav; state.dialGrav=null;
+  closeDial(false);
+  openCall(false, { modo:'discado', telefone:vis, grav:g });
+  // sem preventDefault: o link tel: abre o discador do celular neste mesmo toque
+}
+function flushOutbox(){
+  var out=LS.get('outbox',[]);
+  return out.reduce(function(p,item){
+    return p.then(function(){ return api('enviar',{ligacao:item}).then(function(){
+      LS.set('outbox', LS.get('outbox',[]).filter(function(x){return x.id!==item.id;})); toast('Ligação pendente reenviada.');
+    }).catch(function(){}); });
+  }, Promise.resolve()).then(flushAudioBox);
+}
+
+function loadHist(){
+  var h=$('hist'); h.innerHTML='<div class="empty">Carregando…</div>';
+  var out=LS.get('outbox',[]);
+  Promise.all([api('minhas'), AudioBox.all().catch(function(){ return []; })]).then(function(res){
+    var j=res[0]; out=out.concat(res[1].map(function(x){ return x.meta; }));
+    var rows=out.map(function(o){ return '<div class="it"><b>'+esc(o.lead_nome)+'</b> <span class="pill st-Erro">Neste aparelho, aguardando envio</span></div>'; });
+    rows=rows.concat((j.itens||[]).map(function(i){
+      var st=String(i.status||''), cls = st.indexOf('Erro')===0?'Erro':st;
+      var tag = i.origem==='audio_gravado'?'áudio gravado':i.origem==='audio_anexo'?'áudio anexado':'ligação';
+      return '<div class="it"><div style="display:flex;justify-content:space-between;gap:8px"><b>'+esc(i.lead_nome)+'<span class="tag">'+esc((i.tipo||'Ligacao')+' · '+tag)+'</span></b><span class="pill st-'+esc(cls)+'">'+esc(st.indexOf('Erro')===0?'Erro':st)+'</span></div>'+
+        '<div style="color:var(--muted);font-size:12px;margin-top:4px">#'+esc(i.lead_id)+' · '+new Date(i.timestamp).toLocaleString('pt-BR')+'</div>'+
+        (i.conclusao?'<div style="font-size:13px;margin-top:6px"><b>Conclusão:</b> '+esc(i.conclusao)+'</div>':'')+
+        (i.resultado?'<div style="font-size:13px;margin-top:6px">'+esc(i.resultado)+'</div>':'')+'</div>';
+    }));
+    h.innerHTML = rows.join('') || '<div class="empty">Nenhum envio ainda.</div>';
+  }).catch(function(e){ h.innerHTML='<div class="empty">Não consegui carregar: '+esc(e.message)+'</div>'; });
+}
+
+/* ---------- áudio: anexar arquivo ou gravar (o bot transcreve depois) ---------- */
+var AUDIO_AVISO = 25*1048576, AUDIO_MAX = 35*1048576;
+// Caixa de saída dos áudios no IndexedDB (o localStorage não comporta arquivos).
+var AudioBox = {
+  _db:null,
+  open:function(){
+    var self=this;
+    if(self._db) return Promise.resolve(self._db);
+    return new Promise(function(ok,ko){
+      if(!window.indexedDB) return ko(new Error('sem IndexedDB'));
+      var r=indexedDB.open('ata-audios',1);
+      r.onupgradeneeded=function(){ r.result.createObjectStore('fila',{keyPath:'id'}); };
+      r.onsuccess=function(){ self._db=r.result; ok(r.result); };
+      r.onerror=function(){ ko(r.error||new Error('IndexedDB')); };
+    });
+  },
+  _tx:function(mode, fn){
+    return this.open().then(function(db){ return new Promise(function(ok,ko){
+      var t=db.transaction('fila',mode), st=t.objectStore('fila'), out=fn(st);
+      t.oncomplete=function(){ ok(out && out.result!==undefined ? out.result : undefined); };
+      t.onerror=function(){ ko(t.error); }; t.onabort=function(){ ko(t.error||new Error('abort')); };
+    }); });
+  },
+  put:function(item){ return this._tx('readwrite', function(st){ st.put(item); }); },
+  del:function(id){ return this._tx('readwrite', function(st){ st.delete(id); }); },
+  all:function(){ return this._tx('readonly', function(st){ return st.getAll(); }); }
+};
+function blobToBase64(blob){
+  return new Promise(function(ok,ko){
+    var fr=new FileReader();
+    fr.onload=function(){ var s=String(fr.result||''); ok(s.slice(s.indexOf(',')+1)); };
+    fr.onerror=function(){ ko(fr.error||new Error('Não consegui ler o áudio.')); };
+    fr.readAsDataURL(blob);
+  });
+}
+function extDe(nome){ var m=String(nome||'').match(/\.([a-z0-9]{2,5})$/i); return m?m[1].toLowerCase():''; }
+function mimeDe(file){
+  if(file.type && file.type!=='application/octet-stream') return file.type;
+  var e=extDe(file.name);
+  return ({opus:'audio/ogg',ogg:'audio/ogg',oga:'audio/ogg',m4a:'audio/mp4',mp4:'audio/mp4',aac:'audio/aac',mp3:'audio/mpeg',wav:'audio/wav',webm:'audio/webm',amr:'audio/amr','3gp':'audio/3gpp'})[e] || 'application/octet-stream';
+}
+function pickRecMime(){
+  if(!window.MediaRecorder || !MediaRecorder.isTypeSupported) return '';
+  // Safari/iPhone grava melhor em mp4 (AAC); Chrome/Android em webm (Opus).
+  var opts = (isIOS || isSafari)
+    ? ['audio/mp4;codecs=mp4a.40.2','audio/mp4','audio/aac','audio/webm;codecs=opus','audio/webm']
+    : ['audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus','audio/mp4;codecs=mp4a.40.2','audio/mp4','audio/aac'];
+  for(var i=0;i<opts.length;i++){ try{ if(MediaRecorder.isTypeSupported(opts[i])) return opts[i]; }catch(e){} }
+  return '';
+}
+function extDoMime(m){ m=String(m||''); return m.indexOf('webm')!==-1?'webm':m.indexOf('ogg')!==-1?'ogg':(m.indexOf('mp4')!==-1||m.indexOf('aac')!==-1)?'m4a':'audio'; }
+
+var Rec = { g:null, tick:null };
+function auErr(msg){ var e=$('au-err'); e.textContent=msg||''; e.hidden=!msg; if(msg && e.scrollIntoView) e.scrollIntoView({block:'center', behavior:'smooth'}); }
+function openAudio(modo){
+  var l=state.sel; if(!l) return;
+  state.audio = { id:uid(), modo:modo, lead_id:l.lead_id, lead_nome:(l.empresa||l.razao_social||''), tipo:'', blob:null, nome:'', mime:'', dur:0 };
+  $('au-title').firstChild.nodeValue = modo==='gravado' ? 'Gravar áudio' : 'Anexar áudio';
+  $('au-nm').textContent = state.audio.lead_nome+'  #'+l.lead_id;
+  $('au-rec-card').hidden = modo!=='gravado'; $('au-file-card').hidden = modo!=='anexo';
+  $('au-player').hidden=true; $('au-player').removeAttribute('src');
+  $('au-fnm').textContent='Nenhum arquivo escolhido'; $('au-finfo').textContent='Toque em Trocar para escolher (WhatsApp, gravador, arquivos).';
+  $('au-notas').value=''; $('au-ini').value=''; $('au-fim').value=''; auErr('');
+  document.querySelectorAll('#au-tipo button').forEach(function(b){ b.classList.remove('on'); });
+  $('au-timer').textContent='00:00'; $('au-rstat').textContent='Toque para gravar'; $('au-recbtn').classList.remove('on');
+  if(Rec.g){ gravParar(Rec.g); Rec.g=null; }
+  show('s-audio');
+  renderBanner('banner-audio', modo==='gravado');
+  if(modo==='gravado' && !micDisponivel()) auErr(msgSemMic());
+}
+function setAudioBlob(blob, nome, mime){
+  var a=state.audio; a.blob=blob; a.nome=nome; a.mime=mime;
+  var p=$('au-player'); try{ if(p.src) URL.revokeObjectURL(p.src); }catch(e){}
+  p.src=URL.createObjectURL(blob); p.hidden=false;
+}
+function durDe(blob){
+  return new Promise(function(ok){
+    var el=document.createElement('audio'), done=false, url=URL.createObjectURL(blob);
+    function fim(v){ if(done) return; done=true; try{ URL.revokeObjectURL(url); }catch(e){} ok(v); }
+    el.preload='metadata';
+    el.onloadedmetadata=function(){ var d=el.duration; fim(isFinite(d)&&d>0 ? d : 0); };
+    el.onerror=function(){ fim(0); };
+    setTimeout(function(){ fim(0); }, 4000);
+    el.src=url;
+  });
+}
+function onFilePicked(file){
+  if(!file) return;
+  if(!state.audio || state.audio.modo!=='anexo') openAudio('anexo');
+  auErr('');
+  if(file.size > AUDIO_MAX){ auErr('Arquivo de '+mb(file.size)+': o limite é '+mb(AUDIO_MAX)+'. Corte o áudio ou mande em partes.'); return; }
+  var mime=mimeDe(file);
+  if(!/^audio\/|^video\/(mp4|webm|3gpp)/.test(mime) && !extDe(file.name)){ auErr('Esse arquivo não parece ser áudio.'); return; }
+  setAudioBlob(file, file.name||('audio.'+extDoMime(mime)), mime);
+  $('au-fnm').textContent=file.name||'áudio';
+  $('au-finfo').textContent=mb(file.size)+' · lendo duração…';
+  durDe(file).then(function(d){
+    var a=state.audio; if(!a || a.blob!==file) return;
+    a.dur=d; var agora=new Date();
+    $('au-fim').value=toLocalInput(agora);
+    $('au-ini').value=toLocalInput(d ? new Date(agora.getTime()-d*1000) : agora);
+    $('au-finfo').textContent=mb(file.size)+(d?' · '+mmss(d*1000):' · duração desconhecida (confira o horário)');
+    if(file.size > AUDIO_AVISO) auErr('Áudio grande ('+mb(file.size)+'): o envio pode demorar. Prefira Wi-Fi.');
+  });
+}
+/* Microfone: getUserMedia é chamado direto no toque (sem await antes), como o iOS exige. */
+function micDisponivel(){ return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder); }
+/* Navegador atual, para dar o caminho certo de permissão do microfone. */
+var NAV = inApp ? 'inapp' : /CriOS/.test(UA) ? 'chrome-ios' : /FxiOS/.test(UA) ? 'firefox-ios' : /EdgiOS/.test(UA) ? 'edge-ios'
+  : isIOS ? 'safari-ios' : /Android/.test(UA) && /SamsungBrowser/.test(UA) ? 'samsung' : /Android/.test(UA) && /Firefox/.test(UA) ? 'firefox-android'
+  : /Android/.test(UA) && /EdgA/.test(UA) ? 'edge-android' : /Android/.test(UA) ? 'chrome-android' : 'desktop';
+var ANEXAR = ' Enquanto isso, use "Anexar áudio" com um áudio do gravador ou do WhatsApp.';
+function comoPermitirMic(){
+  switch(NAV){
+    case 'chrome-ios': return 'No Chrome do iPhone: 1) Ajustes do iPhone > Chrome > Microfone (ativar). 2) No Chrome, toque no cadeado ao lado do endereço > Microfone > Permitir; ou feche a aba, abra o link de novo e toque em gravar para o Chrome perguntar outra vez. Se não der, abra o link no Safari.';
+    case 'firefox-ios': return 'No Firefox do iPhone: Ajustes do iPhone > Firefox > Microfone (ativar). Depois feche a aba, abra o link de novo e toque em gravar. Se não der, abra o link no Safari.';
+    case 'edge-ios': return 'No Edge do iPhone: Ajustes do iPhone > Edge > Microfone (ativar). Depois feche a aba, abra o link de novo e toque em gravar. Se não der, abra o link no Safari.';
+    case 'safari-ios': return 'No Safari: toque em "aA" na barra de endereço > Ajustes do Site > Microfone > Permitir. Ou Ajustes do iPhone > Apps > Safari > Microfone > "Perguntar" ou "Permitir". Depois toque de novo para gravar.';
+    case 'inapp': return 'Dentro do '+inAppName+' o microfone não é liberado: '+(isIOS?'toque em ⋯ > Abrir no Safari (ou "Abrir no Safari" no aviso amarelo)':'toque em ⋮ > Abrir no Chrome')+' e grave por lá.';
+    case 'samsung': return 'No Samsung Internet: menu ≡ > Configurações > Sites e downloads > Permissões do site > Microfone > permitir este site. Ou Configurações do Android > Apps > Samsung Internet > Permissões > Microfone.';
+    case 'firefox-android': return 'No Firefox: toque no cadeado ao lado do endereço > Microfone > Permitir. Ou Configurações do Android > Apps > Firefox > Permissões > Microfone.';
+    case 'edge-android': case 'chrome-android': return 'No Chrome: toque no cadeado ao lado do endereço > Permissões > Microfone > Permitir. Se não aparecer, Configurações do Android > Apps > Chrome > Permissões > Microfone > Permitir. Depois toque de novo para gravar.';
+    default: return 'Toque no cadeado ao lado do endereço > Microfone > Permitir e tente de novo.';
+  }
+}
+function msgSemMic(){
+  if(inApp) return 'O navegador dentro do '+inAppName+' não libera o microfone. '+(isIOS?'Toque em "Abrir no Safari" (ou ⋯ > Abrir no Safari)':'Toque em ⋮ > Abrir no Chrome')+' e grave por lá.'+ANEXAR;
+  return 'Este navegador não grava áudio. '+(isIOS?'Atualize o iOS e use o Safari ou o Chrome':'Use o Chrome atualizado')+'.'+ANEXAR;
+}
+function msgErroMic(e){
+  var n = e && e.name;
+  if(n==='NotAllowedError' || n==='SecurityError' || n==='PermissionDeniedError')
+    return 'Permissão do microfone negada. '+comoPermitirMic()+ANEXAR;
+  if(n==='NotFoundError' || n==='OverconstrainedError') return 'Nenhum microfone encontrado neste aparelho.'+ANEXAR;
+  if(n==='NotReadableError' || n==='AbortError' || n==='TrackStartError') return 'O microfone está ocupado (outro app ou uma ligação em andamento). Feche o outro app ou espere a ligação terminar e tente de novo.';
+  if(n==='Timeout') return 'O navegador não respondeu ao pedido do microfone.'+(inApp?' Isso é comum dentro do '+inAppName+': '+(isIOS?'abra no Safari.':'abra no Chrome.'):' Feche a aba, abra o link de novo e tente.')+ANEXAR;
+  return 'Não consegui abrir o microfone ('+((e&&e.message)||n||e)+').'+ANEXAR;
+}
+/** Abre o microfone e começa a gravar. cb.ok(g) com o gravador; cb.erro(msg); cb.interrompido(motivo) se o sistema cortar o microfone. */
+function micGravar(cb){
+  if(!micDisponivel()){ cb.erro(msgSemMic()); return; }
+  var acabou=false, prom;
+  var timer=setTimeout(function(){ if(acabou) return; acabou=true; cb.erro(msgErroMic({name:'Timeout'})); }, 12000);
+  try{ prom = navigator.mediaDevices.getUserMedia({ audio:true }); }
+  catch(e){ clearTimeout(timer); cb.erro(msgErroMic(e)); return; }
+  prom.then(function(stream){
+    if(acabou){ stream.getTracks().forEach(function(t){ t.stop(); }); return; }
+    acabou=true; clearTimeout(timer);
+    var mime=pickRecMime(), mr;
+    var mo = mime ? { mimeType:mime } : {};
+    if(!isIOS && !isSafari) mo.audioBitsPerSecond = 32000; // no iPhone, deixa o padrão do WebKit
+    try{ mr = new MediaRecorder(stream, mo); }
+    catch(e){ try{ mr=new MediaRecorder(stream); }catch(e2){ stream.getTracks().forEach(function(t){ t.stop(); }); cb.erro('Este navegador não consegue gravar ('+(e2.message||e2)+'). Use "Anexar áudio".'); return; } }
+    var g = { mr:mr, stream:stream, chunks:[], t0:Date.now(), fimT:0, mime:mr.mimeType||mime||'audio/mp4', parado:false, interrompido:'', _cbs:[] };
+    mr.ondataavailable=function(ev){ if(ev.data && ev.data.size) g.chunks.push(ev.data); };
+    mr.onstop=function(){
+      g.parado=true; g.fimT=g.fimT||Date.now();
+      stream.getTracks().forEach(function(t){ try{ t.stop(); }catch(e){} });
+      var tipo=String((g.chunks[0]&&g.chunks[0].type)||g.mime||'audio/mp4'); g.mime=tipo;
+      var blob=new Blob(g.chunks,{type:tipo}); g.blob=blob;
+      var l=g._cbs; g._cbs=[]; l.forEach(function(f){ f(blob); });
+      if(g.interrompido && cb.interrompido) cb.interrompido(g.interrompido, g);
+    };
+    mr.onerror=function(ev){ g.interrompido=g.interrompido||('erro: '+((ev.error&&ev.error.message)||'gravador')); gravParar(g); };
+    stream.getAudioTracks().forEach(function(t){
+      // iOS corta (mute/ended) a captura quando entra uma ligação ou o Safari vai para segundo plano.
+      t.addEventListener('ended', function(){ if(!g.parado){ g.interrompido=g.interrompido||'microfone encerrado pelo sistema'; gravParar(g); } });
+      t.addEventListener('mute', function(){ if(!g.parado){ g.interrompido=g.interrompido||'microfone cortado pelo sistema'; gravParar(g); } });
+    });
+    try{ mr.start(1000); }catch(e){ stream.getTracks().forEach(function(t){ t.stop(); }); cb.erro('Não consegui iniciar a gravação ('+(e.message||e)+').'); return; }
+    cb.ok(g);
+  }).catch(function(e){ if(acabou) return; acabou=true; clearTimeout(timer); cb.erro(msgErroMic(e)); });
+}
+function gravParar(g, fn){
+  if(!g) return;
+  if(fn){ if(g.parado && g.blob) { fn(g.blob); return; } g._cbs.push(fn); }
+  if(!g.parado && g.mr.state!=='inactive'){ g.fimT=Date.now(); try{ if(g.mr.requestData) g.mr.requestData(); }catch(e){} try{ g.mr.stop(); }catch(e){ g.parado=true; g.blob=new Blob(g.chunks,{type:g.mime}); var l=g._cbs; g._cbs=[]; l.forEach(function(f){ f(g.blob); }); } }
+}
+function gravAtivo(g){ return !!(g && !g.parado && g.mr.state!=='inactive'); }
+/** No iOS, o "click" pode falhar em alguns WebViews: trata o toque (touchend) e o clique, sem disparar duas vezes. */
+function onTap(el, fn){
+  var ultimo=0;
+  el.addEventListener('touchend', function(ev){ ev.preventDefault(); ultimo=Date.now(); fn(ev); }, { passive:false });
+  el.addEventListener('click', function(ev){ if(Date.now()-ultimo<700) return; fn(ev); });
+}
+
+function recStart(){
+  auErr('');
+  var a=state.audio; if(!a) return;
+  $('au-rstat').textContent='Abrindo o microfone…';
+  micGravar({
+    ok:function(g){
+      if(!state.audio){ gravParar(g); return; }
+      Rec.g=g;
+      $('au-recbtn').classList.add('on'); $('au-rstat').textContent='Gravando… toque para parar';
+      $('au-player').hidden=true; keepAwake(true);
+      clearInterval(Rec.tick); Rec.tick=setInterval(function(){ $('au-timer').textContent=mmss(Date.now()-g.t0); }, 500);
+      g._cbs.push(function(blob){ recPronto(g, blob); });
+    },
+    erro:function(msg){ $('au-rstat').textContent='Toque para gravar'; auErr(msg); },
+    interrompido:function(motivo, g){ if(Rec.g===g) auErr('A gravação parou sozinha ('+motivo+'). O que foi gravado até aqui ficou salvo: ouça abaixo e envie, ou grave de novo.'); }
+  });
+}
+function recPronto(g, blob){
+  clearInterval(Rec.tick); keepAwake(false); $('au-recbtn').classList.remove('on');
+  if(!state.audio || Rec.g!==g) return;
+  if(!blob.size){ $('au-rstat').textContent='Nada foi gravado. Toque para gravar de novo.'; auErr(isIOS?'O iPhone não entregou áudio. Verifique a permissão do microfone ou abra no Safari.':'Nada foi gravado. Tente de novo.'); return; }
+  setAudioBlob(blob, 'gravacao.'+extDoMime(g.mime), g.mime);
+  state.audio.dur=(g.fimT-g.t0)/1000;
+  $('au-timer').textContent=mmss(g.fimT-g.t0);
+  $('au-ini').value=toLocalInput(new Date(g.t0)); $('au-fim').value=toLocalInput(new Date(g.fimT));
+  $('au-rstat').textContent='Gravado ('+mb(blob.size)+'). Ouça abaixo ou grave de novo.';
+  if(blob.size > AUDIO_MAX) auErr('Gravação de '+mb(blob.size)+': passa do limite de '+mb(AUDIO_MAX)+'.');
+  else if(blob.size > AUDIO_AVISO) auErr('Gravação grande ('+mb(blob.size)+'): o envio pode demorar. Prefira Wi-Fi.');
+}
+function recStop(){ clearInterval(Rec.tick); keepAwake(false); $('au-recbtn').classList.remove('on'); if(Rec.g) gravParar(Rec.g); }
+function recording(){ return gravAtivo(Rec.g); }
+function audioMeta(a){
+  return { id:a.id, lead_id:a.lead_id, lead_nome:a.lead_nome, origem:a.modo==='gravado'?'audio_gravado':'audio_anexo', tipo:a.tipo,
+    hora_inicio:fromLocalInput($('au-ini').value), hora_fim:fromLocalInput($('au-fim').value), notas:$('au-notas').value, transcricao:'' };
+}
+function mostrarResultado(j){
+  var st=String(j.status||''), ok=st==='Lançada', erro=st.indexOf('Erro')===0;
+  $('done-h').textContent = ok ? 'Lançada no Lupe' : erro ? 'Não foi lançada' : 'Recebida';
+  $('done-txt').textContent = ok ? (j.resultado||'Atividade criada.') + (j.conclusao ? ' — ' + j.conclusao : '')
+    : erro ? st.replace(/^Erro:\s*/,'') : 'Vai para o Lupe em alguns minutos. Acompanhe em Últimos envios (relógio).';
+  var w=$('done-warn'); w.hidden=!(j.avisos&&j.avisos.length); w.textContent=(j.avisos||[]).join(' ');
+  show('s-done');
+}
+function sendAudioItem(meta, blob, nome, mime){
+  return blobToBase64(blob).then(function(b64){
+    return api('enviar', { ligacao: Object.assign({}, meta, { audio:{ base64:b64, mime:mime, nome:nome, tamanho:blob.size } }) });
+  });
+}
+function leaveAudio(){ state.audio=null; state.sel=null; $('bar').classList.remove('on'); var p=$('au-player'); try{ if(p.src) URL.revokeObjectURL(p.src); }catch(e){} p.removeAttribute('src'); }
+function sendAudio(){
+  var a=state.audio; if(!a) return;
+  if(recording()){ auErr('Pare a gravação antes de enviar.'); return; }
+  if(!a.blob){ auErr(a.modo==='gravado'?'Grave o áudio antes de enviar.':'Escolha o arquivo de áudio.'); return; }
+  if(a.blob.size > AUDIO_MAX){ auErr('Áudio acima de '+mb(AUDIO_MAX)+'.'); return; }
+  if(!a.tipo){ auErr('Escolha o tipo: Chamada ou E-mail.'); return; }
+  var meta=audioMeta(a);
+  if(!meta.hora_inicio || !meta.hora_fim){ auErr('Preencha a hora inicial e a final.'); return; }
+  if(meta.hora_fim < meta.hora_inicio){ auErr('A hora final está antes da inicial.'); return; }
+  if(a.blob.size > AUDIO_AVISO && !confirm('Áudio de '+mb(a.blob.size)+'. O envio pode demorar e gastar dados. Enviar agora?')) return;
+  auErr('');
+  var b=$('au-send'); b.disabled=true; b.innerHTML='<span class="spin"></span>Enviando '+mb(a.blob.size)+'…';
+  sendAudioItem(meta, a.blob, a.nome, a.mime).then(function(j){
+    leaveAudio();
+    mostrarResultado(j);
+  }).catch(function(err){
+    // erro do servidor (ex.: tipo inválido) não adianta reenviar: mostra e deixa corrigir
+    if(!/Failed to fetch|NetworkError|Load failed|Servidor respondeu|network|login|Entre/i.test(err.message)){ auErr('Não foi enviado: '+err.message); return; }
+    return AudioBox.put({ id:meta.id, meta:meta, blob:a.blob, nome:a.nome, mime:a.mime }).then(function(){
+      leaveAudio();
+      $('done-warn').hidden=false; $('done-warn').textContent='Sem conexão com a planilha ('+err.message+'). O áudio ficou guardado neste aparelho e será reenviado automaticamente.';
+      show('s-done');
+    }).catch(function(){ auErr('Sem conexão ('+err.message+') e não consegui guardar o áudio no aparelho. Não feche esta tela e toque em Enviar de novo.'); });
+  }).finally(function(){ b.disabled=false; b.textContent='Enviar'; });
+}
+function flushAudioBox(){
+  return AudioBox.all().then(function(itens){
+    return (itens||[]).reduce(function(p,it){
+      return p.then(function(){ return sendAudioItem(it.meta, it.blob, it.nome, it.mime).then(function(){ return AudioBox.del(it.id).then(function(){ toast('Áudio pendente reenviado.'); }); }).catch(function(){}); });
+    }, Promise.resolve());
+  }).catch(function(){});
+}
+
+/* ---------- eventos ---------- */
+$('cfg-save').onclick=saveCfg;
+$('q').addEventListener('input', renderList);
+$('list').addEventListener('click', function(ev){
+  var m=ev.target.closest('.more'); if(m){ var e=m.getAttribute('data-etapa'); state.kcap[e]=(state.kcap[e]||KCAP)+KCAP; var sl=$('list').scrollLeft; renderList(); $('list').scrollLeft=sl; return; }
+  var b=ev.target.closest('.lead'); if(b) selectLead(b.getAttribute('data-id'));
+});
+$('btn-start').onclick=function(){ if(state.sel) openCall(false); };
+$('btn-dial').onclick=openDial;
+$('dial-num').addEventListener('input', function(){ setNum(this.value); });
+(function(){
+  var kp=$('keypad'), timer=null, longo=false;
+  kp.addEventListener('pointerdown', function(ev){
+    var b=ev.target.closest('.key'); if(!b) return; b.classList.add('press'); longo=false;
+    if(b.getAttribute('data-k')==='0'){ clearTimeout(timer); timer=setTimeout(function(){ longo=true; dialKey('+'); }, 550); }
+  });
+  ['pointerup','pointercancel','pointerleave'].forEach(function(t){ kp.addEventListener(t, function(){ clearTimeout(timer); kp.querySelectorAll('.press').forEach(function(x){ x.classList.remove('press'); }); }); });
+  kp.addEventListener('click', function(ev){ var b=ev.target.closest('.key'); if(!b) return; if(longo){ longo=false; return; } dialKey(b.getAttribute('data-k')); });
+  kp.addEventListener('contextmenu', function(ev){ ev.preventDefault(); });
+  var del=$('dial-del'), dt=null, apagou=false;
+  del.addEventListener('pointerdown', function(){ apagou=false; clearTimeout(dt); dt=setTimeout(function(){ apagou=true; setNum(''); }, 600); });
+  ['pointerup','pointercancel','pointerleave'].forEach(function(t){ del.addEventListener(t, function(){ clearTimeout(dt); }); });
+  del.addEventListener('click', function(){ if(apagou){ apagou=false; return; } var v=telLimpo($('dial-num').value); setNum(v.slice(0,-1)); });
+  $('dial-paste').addEventListener('click', function(){
+    if(navigator.clipboard && navigator.clipboard.readText){
+      navigator.clipboard.readText().then(function(t){ if(digits(t).length<3){ toast('Não há número copiado.'); return; } setNum(t); })
+        .catch(function(){ $('dial-num').focus(); toast('Toque e segure no número > Colar.'); });
+    } else { $('dial-num').focus(); toast('Toque e segure no número > Colar.'); }
+  });
+})();
+$('dial-chips').addEventListener('click', function(ev){ var b=ev.target.closest('button'); if(b) setNum(b.getAttribute('data-tel')); });
+$('dial-rec').addEventListener('click', dialRecToggle);
+$('dial-go').addEventListener('click', dialGo);
+$('dial-cancel').onclick=function(){ closeDial(true); }; $('dial-bg').onclick=function(){ closeDial(true); };
+$('btn-view').onclick=function(){ state.view = state.view==='kanban' ? 'lista' : 'kanban'; LS.set('view', state.view); renderList(); };
+$('kchips').addEventListener('click', function(ev){ var b=ev.target.closest('.kchip'); if(!b) return; var col=$('list').querySelectorAll('.kcol')[+b.getAttribute('data-col')]; if(col) $('list').scrollTo({ left: col.offsetLeft - 14, behavior:'smooth' }); });
+$('cfg-link').addEventListener('keydown', function(ev){ if(ev.key==='Enter') saveCfg(); });
+$('cfg-senha').addEventListener('keydown', function(ev){ if(ev.key==='Enter') saveCfg(); });
+$('cfg-paste').onclick=function(){ navigator.clipboard.readText().then(function(t){ $('cfg-link').value=t||''; }).catch(function(){ toast('Não consegui colar. Toque e segure no campo > Colar.'); }); };
+$('btn-rec').onclick=function(){ if(state.sel) openAudio('gravado'); };
+$('btn-attach').onclick=function(){ if(!state.sel) return; openAudio('anexo'); $('file-audio').value=''; $('file-audio').click(); };
+$('au-change').onclick=function(){ $('file-audio').value=''; $('file-audio').click(); };
+$('file-audio').addEventListener('change', function(){ onFilePicked(this.files && this.files[0]); });
+onTap($('au-recbtn'), function(){ recording() ? recStop() : recStart(); });
+$('au-tipo').addEventListener('click', function(ev){ var b=ev.target.closest('button'); if(!b||!state.audio) return; state.audio.tipo=b.getAttribute('data-v');
+  document.querySelectorAll('#au-tipo button').forEach(function(x){ x.classList.toggle('on', x===b); }); });
+$('au-send').onclick=sendAudio;
+function auSair(){ if((recording() || (state.audio&&state.audio.blob)) && !confirm('Descartar este áudio?')) return; recStop(); state.audio=null; show('s-list'); renderList(); }
+$('au-back').onclick=auSair; $('au-discard').onclick=auSair;
+$('btn-reload').onclick=function(){ loadLeads(false); flushOutbox(); };
+$('btn-pause').onclick=function(){ state.call.running ? pauseCall() : resumeCall(); };
+$('btn-end').onclick=endCall;
+$('notas').addEventListener('input', function(){ if(state.call){ state.call.notas=this.value; draft(); } });
+$('call-back').onclick=function(){
+  if(state.call && (state.call.transcricao || state.call.notas) && !confirm('Sair e descartar esta ligação?')) return;
+  pauseCall(); descartarGravacao(); state.call=null; LS.del('draft'); show('s-list');
+};
+$('rev-back').onclick=function(){ openCall(true); };
+$('btn-send').onclick=send;
+$('btn-discard').onclick=function(){ if(confirm('Descartar esta ligação? O texto será apagado.')){ descartarGravacao(); state.call=null; state.sel=null; $('bar').classList.remove('on'); LS.del('draft'); show('s-list'); renderList(); } };
+$('btn-new').onclick=function(){ $('q').value=''; show('s-list'); renderList(); loadLeads(true); };
+$('btn-hist').onclick=function(){ show('s-hist'); loadHist(); };
+$('hist-back').onclick=function(){ show('s-list'); };
+$('btn-reset').onclick=function(){ if(confirm('Sair deste aparelho? Para voltar, entre de novo com o login do Lupe.')){ api('sair').catch(function(){}); LS.del('leads'); state.leads=[]; sairDoApp(); } };
+window.addEventListener('online', flushOutbox);
+document.addEventListener('visibilitychange', function(){
+  // ao voltar para o app (ex.: depois de atender/desligar), retoma a transcrição se ela estava ligada
+  if(document.visibilityState!=='visible') return;
+  if(state.call && state.call.running && state.call.modo==='voz' && SR && !Engine.want){ Engine.start(); }
+  // alguns iOS não avisam o corte do microfone: confere ao voltar para o app
+  [state.callGrav, state.dialGrav, Rec.g].forEach(function(g){
+    if(gravAtivo(g) && g.stream.getAudioTracks().some(function(t){ return t.readyState==='ended' || t.muted; })){ g.interrompido=g.interrompido||'microfone cortado pelo sistema'; gravParar(g); }
+  });
+});
+
+/* ---------- início ---------- */
+function boot(){
+  readHash();
+  if(!cfg()){
+    $('cfg-link-card').style.display = apiConhecida() ? 'none' : '';
+    if(!$('cfg-email').value) $('cfg-email').value = LS.get('email','');
+    if(isIOS && standalone) $('cfg-intro').innerHTML='No iPhone, o ícone da tela de início tem memória separada do Safari. <b>Cole o link do app</b> abaixo uma vez (copie do e-mail), ou apague o ícone e crie de novo pelo <b>Safari</b> a partir do link.';
+    else if(inApp) $('cfg-intro').innerHTML='Abra o <b>link do app</b> que você recebeu, de preferência no <b>Safari</b>/Chrome. Ou cole o link inteiro abaixo.';
+    $('cfg-paste').hidden = !(navigator.clipboard && navigator.clipboard.readText);
+    show('s-config'); return;
+  }
+  hashDaCfg();
+  renderBanner('banner-list', false);
+  var d=LS.get('draft',null);
+  if(d){ state.call=d; d.running=false; state.sel={lead_id:d.lead_id}; toast('Rascunho recuperado.'); endCall(); return; }
+  show('s-list'); renderList(); loadLeads(state.leads.length>0); flushOutbox();
+  api('ping').then(function(j){ if(j.vendedor) $('who').textContent=j.vendedor; state.srv={ versao:j.versao||1, audio_na_ligacao:!!j.audio_na_ligacao }; LS.set('srv', state.srv); }).catch(function(){});
+}
+if('serviceWorker' in navigator && location.protocol==='https:') navigator.serviceWorker.register('sw.js').catch(function(){});
+window.__ata = { NAV: NAV, state: state, Engine: Engine, AudioBox: AudioBox, pickRecMime: pickRecMime };
+boot();
+})();
+</script>
+</body>
+</html>
