@@ -375,9 +375,9 @@ a.btn{text-decoration:none}
 (function(){
 'use strict';
 var LS = {
-  get: function(k, d){ try{ var v = localStorage.getItem('ata.'+k); return v==null ? d : JSON.parse(v); }catch(e){ return d; } },
-  set: function(k, v){ try{ localStorage.setItem('ata.'+k, JSON.stringify(v)); }catch(e){} },
-  del: function(k){ try{ localStorage.removeItem('ata.'+k); }catch(e){} }
+  get: function(k, d){ try{ var v = localStorage.getItem('ata3.'+k); return v==null ? d : JSON.parse(v); }catch(e){ return d; } },
+  set: function(k, v){ try{ localStorage.setItem('ata3.'+k, JSON.stringify(v)); }catch(e){} },
+  del: function(k){ try{ localStorage.removeItem('ata3.'+k); }catch(e){} }
 };
 var $ = function(id){ return document.getElementById(id); };
 var state = { leads: LS.get('leads', []), sel: null, call: null, callGrav: null, callAudio: null, dialGrav: null, audio: null, view: LS.get('view','kanban'), kcap: {}, srv: LS.get('srv', {}) };
@@ -407,10 +407,12 @@ function cfgValida(c){ return !!(c && c.api && c.token); }
 function cfg(){
   if(cfgValida(CFG)) return CFG;
   var c = cfgDeTexto(location.hash) || LS.get('cfg', null);
+  var h = apiDeTexto(location.hash);
+  if(cfgValida(c) && h && h!==c.api) c = null; // link de outra API: pede login de novo
   if(cfgValida(c)){ CFG = c; return c; }
   return null;
 }
-function setCfg(c){ CFG = c; LS.set('cfg', c); try{ sessionStorage.setItem('ata.cfg', JSON.stringify(c)); }catch(e){} }
+function setCfg(c){ CFG = c; LS.set('cfg', c); try{ sessionStorage.setItem('ata3.cfg', JSON.stringify(c)); }catch(e){} }
 function api(acao, extra){
   var c = cfg();
   if(acao==='login') c = { api: apiConhecida(), token: '' };
@@ -436,13 +438,14 @@ function apiDeTexto(txt){
 function apiConhecida(){ return (CFG&&CFG.api) || apiDeTexto(location.hash) || (LS.get('cfg',null)||{}).api || LS.get('apiUrl','') || ''; }
 function sairDoApp(msg){
   var a=apiConhecida(); CFG=null; LS.del('cfg'); if(a) LS.set('apiUrl', a);
-  try{ sessionStorage.removeItem('ata.cfg'); }catch(e){}
+  try{ sessionStorage.removeItem('ata3.cfg'); }catch(e){}
   try{ history.replaceState(null,'',location.pathname+location.search+(a?'#api='+encodeURIComponent(a):'')); }catch(e){}
   boot(); if(msg){ var e=$('cfg-err'); e.textContent=msg; e.hidden=false; }
 }
 function readHash(){
   var c = cfgDeTexto(location.hash);
-  if(!c){ try{ c = JSON.parse(sessionStorage.getItem('ata.cfg')||'null'); }catch(e){ c=null; } if(!cfgValida(c)) c=null; }
+  if(!c){ try{ c = JSON.parse(sessionStorage.getItem('ata3.cfg')||'null'); }catch(e){ c=null; } if(!cfgValida(c)) c=null; }
+  var h = apiDeTexto(location.hash); if(c && h && h!==c.api) c=null;
   if(c) setCfg(c);
 }
 /* Mantém a configuração no endereço (#api=…&t=…). No iPhone, o ícone da tela de início guarda o endereço atual
@@ -456,6 +459,7 @@ function saveCfg(){
   var e = $('cfg-err'); e.hidden = true;
   var link = $('cfg-link').value.trim(), a = link ? apiDeTexto(link) : apiConhecida();
   if(link && !a){ e.textContent='Esse link não tem a configuração do app (precisa ter "#api=").'; e.hidden=false; return; }
+  if(/\/dev(\?|$)/.test(a)){ e.textContent='Este link é de teste (termina em /dev). Use o link da implantação, que termina em /exec.'; e.hidden=false; return; }
   if(!/^https:\/\/script\.google(usercontent)?\.com\//.test(a) && !/^https?:\/\/(localhost|127\.0\.0\.1)/.test(a)){ e.textContent='Abra o link do app que você recebeu (ou cole-o acima).'; e.hidden=false; return; }
   var email=$('cfg-email').value.trim(), senha=$('cfg-senha').value;
   if(!email || !senha){ e.textContent='Preencha e-mail e senha do Lupe.'; e.hidden=false; return; }
@@ -878,7 +882,7 @@ var AudioBox = {
     if(self._db) return Promise.resolve(self._db);
     return new Promise(function(ok,ko){
       if(!window.indexedDB) return ko(new Error('sem IndexedDB'));
-      var r=indexedDB.open('ata-audios',1);
+      var r=indexedDB.open('ata3-audios',1);
       r.onupgradeneeded=function(){ r.result.createObjectStore('fila',{keyPath:'id'}); };
       r.onsuccess=function(){ self._db=r.result; ok(r.result); };
       r.onerror=function(){ ko(r.error||new Error('IndexedDB')); };
