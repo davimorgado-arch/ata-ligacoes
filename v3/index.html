@@ -96,6 +96,20 @@ textarea.big{min-height:260px}
 .big-ok svg{width:44px;height:44px}
 label.f{display:block;font-size:13px;color:var(--muted);font-weight:600;margin:14px 0 6px}
 input.f{width:100%;height:48px;border:1px solid var(--line);border-radius:12px;padding:0 12px;font:inherit;font-size:15px;background:#fff}
+.wiz-dots{display:flex;gap:6px;justify-content:center;margin:2px 0 4px}
+.wiz-dots i{width:8px;height:8px;border-radius:50%;background:#cfdcda}
+.wiz-dots i.on{background:var(--brand);width:22px;border-radius:4px}
+.body.wiz{padding-bottom:calc(240px + var(--safe-bot))}
+.wiz h2{margin:0;font-size:22px;line-height:1.25}
+.wiz p{margin:0;line-height:1.5}
+.wiz ol{margin:0;padding-left:22px;line-height:1.6}
+.wiz .ok{color:var(--ok);font-weight:700}
+.wiz .meter{height:14px;border-radius:7px;background:#e6eeed;overflow:hidden}
+.wiz .meter i{display:block;height:100%;width:0;background:var(--ok);transition:width .08s}
+.wiz pre{white-space:pre-wrap;font:inherit;font-size:14px;line-height:1.5;margin:0}
+.wiz .cart{display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding:6px 0;font-size:15px}
+.wiz .cart:last-child{border:0}
+.wiz .spin{display:inline-block;vertical-align:middle;width:18px;height:18px;border-color:#cfe3e0;border-top-color:var(--brand);margin-right:6px}
 .toast{position:fixed;left:50%;top:calc(16px + var(--safe-top));transform:translate(-50%,-150%);background:#13201f;color:#fff;
   padding:10px 16px;border-radius:12px;font-size:14px;z-index:50;transition:transform .25s;max-width:90vw}
 .toast.on{transform:translate(-50%,0)}
@@ -198,6 +212,8 @@ a.btn{text-decoration:none}
 <section class="screen" id="s-config">
   <header class="top"><h1>Entrar<span class="sub">Com o seu login do Lupe</span></h1></header>
   <div class="body">
+    <div id="banner-config" style="margin:0 -14px"></div>
+    <div class="card" id="cfg-boas" hidden><p style="margin:0;line-height:1.5"><b>Bem-vindo!</b> Este app transforma suas ligações em atividades no Lupe. Entre com o <b>mesmo e-mail e senha do Lupe</b>.</p></div>
     <div class="card" id="cfg-link-card">
       <p style="margin:0 0 4px" id="cfg-intro">Abra o <b>link do app</b> que você recebeu. Ou cole o link inteiro abaixo.</p>
       <label class="f" for="cfg-link">Link do app</label>
@@ -337,10 +353,18 @@ a.btn{text-decoration:none}
   </div>
 </section>
 
+<!-- ===================== PRIMEIROS PASSOS ===================== -->
+<section class="screen" id="s-wiz">
+  <header class="top"><h1>Primeiros passos<span class="sub" id="wiz-sub">Passo 1</span></h1></header>
+  <div class="body wiz" id="wiz-body"></div>
+  <div class="foot" id="wiz-foot"></div>
+</section>
+
 <!-- ===================== ENVIOS ===================== -->
 <section class="screen" id="s-hist">
   <header class="top"><button class="iconbtn" id="hist-back" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg></button><h1>Últimos envios<span class="sub">Status no Lupe</span></h1></header>
   <div class="hist" id="hist"></div>
+  <div style="padding:8px 16px 0"><button class="btn ghost" id="btn-wiz">Rever os primeiros passos</button></div>
   <div style="padding:8px 16px 30px"><button class="btn ghost" id="btn-reset">Sair (trocar de usuário)</button></div>
 </section>
 
@@ -402,6 +426,9 @@ function mb(n){ n=+n||0; if(n<1024) return n+' bytes'; if(n<1048576) return Math
 /* A config vale na ordem: memória (a que carregou os leads) > endereço (#api=…&t=…) > localStorage.
    Antes, o envio relia só o localStorage: se o WebKit não devolvesse o item (armazenamento bloqueado/limpo,
    ou memória separada do ícone), "App não configurado" aparecia mesmo com os leads carregados. */
+/* Endereço do Apps Script central (o mesmo para todos). Com ele o link do app é só …/ata-ligacoes/v3/.
+   Um #api=… no link ainda tem prioridade (testes locais). */
+var API_PADRAO = 'https://script.google.com/macros/s/AKfycbylPDuL4ps4Xi8cDENCwy7NhSy4WJyRcqDxjueBzxFhIHB6au1kiSd3iuBgGehHOhI/exec';
 var CFG = null;
 function cfgValida(c){ return !!(c && c.api && c.token); }
 function cfg(){
@@ -435,7 +462,7 @@ function apiDeTexto(txt){
   var t=String(txt||'').trim(), i=t.indexOf('#'); if(i===-1) return '';
   return new URLSearchParams(t.slice(i+1)).get('api') || '';
 }
-function apiConhecida(){ return (CFG&&CFG.api) || apiDeTexto(location.hash) || (LS.get('cfg',null)||{}).api || LS.get('apiUrl','') || ''; }
+function apiConhecida(){ return (CFG&&CFG.api) || apiDeTexto(location.hash) || (LS.get('cfg',null)||{}).api || LS.get('apiUrl','') || API_PADRAO; }
 function sairDoApp(msg){
   var a=apiConhecida(); CFG=null; LS.del('cfg'); if(a) LS.set('apiUrl', a);
   try{ sessionStorage.removeItem('ata3.cfg'); }catch(e){}
@@ -1215,6 +1242,154 @@ document.addEventListener('visibilitychange', function(){
   });
 });
 
+/* ---------- primeiros passos (assistente) ---------- */
+var Wiz = { i:0, passos:[], bip:null, mic:null, g:null, leads:null, treino:null };
+window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); Wiz.bip=e; if(Wiz.passos[Wiz.i]==='instalar' && $('s-wiz').classList.contains('on')) wizRender(); });
+window.addEventListener('appinstalled', function(){ Wiz.bip=null; Wiz.instalado=true; if($('s-wiz').classList.contains('on')) wizRender(); });
+function wizPassos(){
+  var p=['leads','mic','treino'];
+  if(!standalone && (isIOS || /Android/.test(UA))) p.push('instalar');
+  p.push('fim'); return p;
+}
+function wizAbrir(){ Wiz.passos=wizPassos(); Wiz.i=0; Wiz.leads=null; Wiz.treino=null; Wiz.mic=null; show('s-wiz'); wizRender(); }
+function wizPararMic(){
+  var m=Wiz.medidor; Wiz.medidor=null;
+  if(m){ clearInterval(m.t); try{ m.stream.getTracks().forEach(function(t){ t.stop(); }); }catch(e){} try{ m.ctx.close(); }catch(e){} }
+  if(Wiz.g){ clearInterval(Wiz.gt); var g=Wiz.g; Wiz.g=null; g.cancelado=true; gravParar(g); }
+}
+function wizIr(d){ wizPararMic(); Wiz.i=Math.max(0, Math.min(Wiz.passos.length-1, Wiz.i+d)); wizRender(); }
+function wizFim(){ wizPararMic(); LS.set('wizFeito', true); show('s-list'); renderList(); flushOutbox(); }
+function wizBtn(acao, txt, cls, off){ return '<button class="btn '+(cls||'')+'" data-w="'+acao+'"'+(off?' disabled':'')+'>'+txt+'</button>'; }
+function wizRender(){
+  var id=Wiz.passos[Wiz.i], n=Wiz.passos.length, b='', f='';
+  $('wiz-sub').textContent='Passo '+(Wiz.i+1)+' de '+n;
+  b+='<div class="wiz-dots">'+Wiz.passos.map(function(_,k){ return '<i'+(k===Wiz.i?' class="on"':'')+'></i>'; }).join('')+'</div>';
+  if(id==='leads'){
+    b+='<h2>Você entrou no Lupe 👋</h2>';
+    if(!Wiz.leads){
+      b+='<div class="card"><p><span class="spin"></span> Buscando os seus leads no Lupe… (pode levar até 1 minuto na primeira vez)</p></div>';
+      f=wizBtn('prox','Continuar','',true);
+      if(!Wiz.carregando){ Wiz.carregando=true;
+        api('leads').then(function(j){ Wiz.leads={ lista:j.leads||[] }; state.leads=Wiz.leads.lista; LS.set('leads', state.leads); })
+          .catch(function(e){ Wiz.leads={ erro:e.message, lista:[] }; })
+          .finally(function(){ Wiz.carregando=false; if(Wiz.passos[Wiz.i]==='leads') wizRender(); });
+      }
+    } else if(Wiz.leads.erro){
+      b+='<div class="note err">Não consegui buscar os leads: '+esc(Wiz.leads.erro)+'</div>';
+      f=wizBtn('leads','Tentar de novo')+wizBtn('prox','Continuar assim mesmo','ghost');
+    } else {
+      var por={}; Wiz.leads.lista.forEach(function(l){ var c=l.carteira||'Sem carteira'; por[c]=(por[c]||0)+1; });
+      var cs=Object.keys(por).sort(function(a,c){ return por[c]-por[a]; });
+      b+='<p>Encontrei <b>'+Wiz.leads.lista.length+' leads abertos</b> no seu funil'+(cs.length?', nestas carteiras:':'.')+'</p>';
+      if(cs.length) b+='<div class="card">'+cs.map(function(c){ return '<div class="cart"><span>'+esc(c)+'</span><b>'+por[c]+'</b></div>'; }).join('')+'</div>';
+      b+= Wiz.leads.lista.length ? '<div class="note">Se faltar alguma carteira ou aparecerem leads que não são seus, avise o Davi antes de usar.</div>'
+        : '<div class="note err">Nenhum lead aberto apareceu. Confira no Lupe se há leads na sua carteira, ou avise o Davi.</div>';
+      f=wizBtn('prox','Está certo, continuar');
+    }
+  } else if(id==='mic'){
+    b+='<h2>Microfone</h2><p>O app grava o áudio da conversa para a IA escrever a ata. Vamos ver se o microfone funciona.</p>';
+    b+='<div class="card"><div class="meter"><i id="wiz-meter"></i></div><p style="margin-top:10px" id="wiz-mic-txt">';
+    b+= Wiz.mic==='ok' ? '<span class="ok">✓ Microfone funcionando.</span>' : Wiz.mic==='mudo' ? 'Não captei som. Fale perto do celular e teste de novo.' : 'Toque em <b>Testar microfone</b> e fale alguma coisa. Se o celular perguntar, toque em <b>Permitir</b>.';
+    b+='</p></div>';
+    if(Wiz.micErro) b+='<div class="note err">'+esc(Wiz.micErro)+'</div>';
+    f=(Wiz.mic==='ok' ? wizBtn('prox','Continuar') : wizBtn('mic', Wiz.mic ? 'Testar de novo' : 'Testar microfone')+wizBtn('prox','Pular','ghost'));
+  } else if(id==='treino'){
+    b+='<h2>Teste com a IA</h2><p>Grave uma fala curta como se estivesse resumindo uma ligação. Por exemplo:</p>';
+    b+='<div class="card"><p><i>“Falei com o Carlos da Padaria Sol. A conta de luz é de 8 mil por mês, ele quer a proposta até sexta.”</i></p></div>';
+    b+='<div class="note"><b>Nada vai para o Lupe.</b> É só para você ver a ata que a IA escreve.</div>';
+    var t=Wiz.treino;
+    if(t && t.gravando) b+='<div class="card"><p><span class="dot live" style="display:inline-block;vertical-align:middle;margin-right:8px"></span>Gravando… <b id="wiz-seg">0</b>s (máx. 30s)</p></div>';
+    if(t && t.enviando) b+='<div class="card"><p><span class="spin"></span> A IA está escrevendo a ata…</p></div>';
+    if(t && t.erro) b+='<div class="note err">'+esc(t.erro)+'</div>';
+    if(t && t.res){
+      if(t.res.sem_fala) b+='<div class="note err">A IA não ouviu fala no áudio. Grave de novo, falando perto do celular.</div>';
+      else b+='<div class="card"><h3>A IA entendeu</h3><pre>'+esc(t.res.transcricao)+'</pre></div><div class="card"><h3>Ata que iria para o Lupe</h3><pre>'+esc(t.res.observacoes)+'</pre></div>';
+    }
+    if(t && t.gravando) f=wizBtn('parar','Parar e ver a ata','red');
+    else if(t && t.enviando) f=wizBtn('prox','Continuar','',true);
+    else if(t && t.res && !t.res.sem_fala) f=wizBtn('prox','Continuar')+wizBtn('gravar','Testar de novo','ghost');
+    else f=wizBtn('gravar','Gravar teste')+wizBtn('prox','Pular','ghost');
+  } else if(id==='instalar'){
+    b+='<h2>Ícone na tela de início</h2>';
+    if(inApp){
+      b+='<p>O link abriu dentro do <b>'+esc(inAppName)+'</b>, e por aqui não dá para instalar.</p><div class="card"><p>'+(isIOS?'Toque em <b>⋯</b> (ou na bússola) > <b>Abrir no Safari</b>. Lá, entre de novo e siga este passo.':'Toque em <b>⋮</b> > <b>Abrir no Chrome</b>. Lá, entre de novo e siga este passo.')+'</p></div>';
+      f=wizBtn('copiar','Copiar link','ghost')+wizBtn('prox','Pular');
+    } else if(Wiz.instalado){
+      b+='<div class="card"><p class="ok">✓ App instalado. Use o ícone “Ata Lupe” da tela de início.</p></div>'; f=wizBtn('prox','Continuar');
+    } else if(isIOS){
+      b+='<p>Assim o app abre como os outros, com um toque.</p><div class="card"><ol>'+
+        '<li>Toque em <b>Compartilhar</b> <span style="font-size:18px">⬆︎</span> (o quadrado com a seta, na barra '+(/CriOS/.test(UA)?'de cima':'de baixo')+').</li>'+
+        '<li>Role e toque em <b>Adicionar à Tela de Início</b>.</li><li>Toque em <b>Adicionar</b>.</li></ol></div>'+
+        '<div class="note">O ícone já abre conectado: não precisa entrar de novo. Depois, use sempre o ícone.</div>';
+      f=wizBtn('prox','Já adicionei')+wizBtn('prox','Pular','ghost');
+    } else {
+      b+='<p>Assim o app abre como os outros, com um toque.</p>';
+      if(Wiz.bip){ f=wizBtn('instalar','Instalar app')+wizBtn('prox','Pular','ghost'); }
+      else { b+='<div class="card"><ol><li>Toque em <b>⋮</b> (canto de cima, à direita).</li><li>Toque em <b>Instalar app</b> ou <b>Adicionar à tela inicial</b>.</li><li>Confirme.</li></ol></div>'; f=wizBtn('prox','Já instalei')+wizBtn('prox','Pular','ghost'); }
+    }
+  } else {
+    b+='<div class="center" style="padding:8px 0;flex:0"><div class="big-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></div><h2>Tudo pronto!</h2></div>';
+    b+='<div class="card"><ol><li>Escolha o lead na lista (dá para buscar por nome ou CNPJ).</li><li>Toque em <b>Ligar</b>, ou em <b>Gravar/Anexar áudio</b> depois de uma conversa.</li><li>Confira e toque em <b>Enviar</b>. A IA escreve a ata e a atividade entra no Lupe no seu nome.</li></ol></div>';
+    b+='<div class="note">Para ver se entrou no Lupe, toque no <b>relógio</b> (Últimos envios). Para rever estes passos, também é por lá.</div>';
+    f=wizBtn('fim','Começar a usar');
+  }
+  if(Wiz.i>0 && id!=='fim' && !(Wiz.treino&&(Wiz.treino.gravando||Wiz.treino.enviando))) f+='<button class="btn ghost" data-w="volta" style="height:40px;font-size:15px;background:none">Voltar</button>';
+  $('wiz-body').innerHTML=b; $('wiz-foot').innerHTML=f;
+}
+function wizTestarMic(){
+  wizPararMic(); Wiz.micErro='';
+  if(!micDisponivel()){ Wiz.mic='erro'; Wiz.micErro=msgSemMic(); wizRender(); return; }
+  var pico=0, fim=Date.now()+4000, prom;
+  try{ prom=navigator.mediaDevices.getUserMedia({ audio:true }); }catch(e){ Wiz.mic='erro'; Wiz.micErro=msgErroMic(e); wizRender(); return; }
+  var AC=window.AudioContext||window.webkitAudioContext, ctx=AC?new AC():null;
+  $('wiz-mic-txt').textContent='Fale alguma coisa…';
+  prom.then(function(stream){
+    var m={ stream:stream, ctx:ctx }; Wiz.medidor=m;
+    var an=null, buf=null;
+    if(ctx){ try{ if(ctx.resume) ctx.resume(); an=ctx.createAnalyser(); an.fftSize=512; ctx.createMediaStreamSource(stream).connect(an); buf=new Uint8Array(an.fftSize); }catch(e){ an=null; } }
+    m.t=setInterval(function(){
+      var v=0;
+      if(an){ an.getByteTimeDomainData(buf); for(var k=0;k<buf.length;k++){ v=Math.max(v, Math.abs(buf[k]-128)/128); } }
+      else v=0.3; // sem medidor: basta ter aberto o microfone
+      pico=Math.max(pico,v); var el=$('wiz-meter'); if(el) el.style.width=Math.min(100, Math.round(v*250))+'%';
+      if(Date.now()>fim){ wizPararMic(); Wiz.mic = pico>0.04 ? 'ok' : 'mudo'; wizRender(); }
+    }, 80);
+  }).catch(function(e){ try{ ctx&&ctx.close(); }catch(x){} Wiz.mic='erro'; Wiz.micErro=msgErroMic(e); wizRender(); });
+}
+function wizGravar(){
+  wizPararMic(); Wiz.treino={ gravando:false };
+  micGravar({
+    ok:function(g){
+      Wiz.g=g; Wiz.treino={ gravando:true }; wizRender();
+      Wiz.gt=setInterval(function(){ var s=Math.floor((Date.now()-g.t0)/1000), el=$('wiz-seg'); if(el) el.textContent=s; if(s>=30) wizPararGravar(); }, 250);
+    },
+    erro:function(msg){ Wiz.treino={ erro:msg }; wizRender(); },
+    interrompido:function(){ }
+  });
+}
+function wizPararGravar(){
+  var g=Wiz.g; if(!g) return; Wiz.g=null; clearInterval(Wiz.gt);
+  Wiz.treino={ enviando:true }; wizRender();
+  gravParar(g, function(blob){
+    if(blob.size<2000){ Wiz.treino={ erro:'A gravação ficou vazia. Tente de novo e fale por alguns segundos.' }; wizRender(); return; }
+    blobToBase64(blob).then(function(b64){
+      return api('treino', { audio:{ base64:b64, mime:blob.type||g.mime, nome:'teste.'+extDoMime(blob.type||g.mime) } });
+    }).then(function(j){ Wiz.treino={ res:j }; }).catch(function(e){ Wiz.treino={ erro:e.message }; })
+      .finally(function(){ if(Wiz.passos[Wiz.i]==='treino') wizRender(); });
+  });
+}
+$('s-wiz').addEventListener('click', function(ev){
+  var el=ev.target.closest('[data-w]'); if(!el || el.disabled) return;
+  var a=el.getAttribute('data-w');
+  if(a==='prox') wizIr(1); else if(a==='volta') wizIr(-1); else if(a==='fim') wizFim();
+  else if(a==='leads'){ Wiz.leads=null; wizRender(); }
+  else if(a==='mic') wizTestarMic();
+  else if(a==='gravar') wizGravar(); else if(a==='parar') wizPararGravar();
+  else if(a==='copiar') copiarLink();
+  else if(a==='instalar' && Wiz.bip){ var e=Wiz.bip; Wiz.bip=null; e.prompt(); (e.userChoice||Promise.resolve({})).then(function(r){ if(r.outcome==='accepted') Wiz.instalado=true; wizRender(); }); }
+});
+$('btn-wiz').onclick=wizAbrir;
+
 /* ---------- início ---------- */
 function boot(){
   readHash();
@@ -1224,17 +1399,20 @@ function boot(){
     if(isIOS && standalone) $('cfg-intro').innerHTML='No iPhone, o ícone da tela de início tem memória separada do Safari. <b>Cole o link do app</b> abaixo uma vez (copie do e-mail), ou apague o ícone e crie de novo pelo <b>Safari</b> a partir do link.';
     else if(inApp) $('cfg-intro').innerHTML='Abra o <b>link do app</b> que você recebeu, de preferência no <b>Safari</b>/Chrome. Ou cole o link inteiro abaixo.';
     $('cfg-paste').hidden = !(navigator.clipboard && navigator.clipboard.readText);
+    $('cfg-boas').hidden = !!LS.get('wizFeito', false);
+    renderBanner('banner-config', true);
     show('s-config'); return;
   }
   hashDaCfg();
   renderBanner('banner-list', false);
   var d=LS.get('draft',null);
   if(d){ state.call=d; d.running=false; state.sel={lead_id:d.lead_id}; toast('Rascunho recuperado.'); endCall(); return; }
+  if(!LS.get('wizFeito', false)){ wizAbrir(); api('ping').then(function(j){ if(j.vendedor) $('who').textContent=j.vendedor; }).catch(function(){}); return; }
   show('s-list'); renderList(); loadLeads(state.leads.length>0); flushOutbox();
   api('ping').then(function(j){ if(j.vendedor) $('who').textContent=j.vendedor; state.srv={ versao:j.versao||1, audio_na_ligacao:!!j.audio_na_ligacao }; LS.set('srv', state.srv); }).catch(function(){});
 }
 if('serviceWorker' in navigator && location.protocol==='https:') navigator.serviceWorker.register('sw.js').catch(function(){});
-window.__ata = { NAV: NAV, state: state, Engine: Engine, AudioBox: AudioBox, pickRecMime: pickRecMime };
+window.__ata = { NAV: NAV, state: state, Wiz: Wiz, wizRender: wizRender, api: api, Engine: Engine, AudioBox: AudioBox, pickRecMime: pickRecMime };
 boot();
 })();
 </script>
