@@ -430,6 +430,7 @@ function mb(n){ n=+n||0; if(n<1024) return n+' bytes'; if(n<1048576) return Math
    Um #api=… no link ainda tem prioridade (testes locais). */
 var API_PADRAO = 'https://script.google.com/macros/s/AKfycbylPDuL4ps4Xi8cDENCwy7NhSy4WJyRcqDxjueBzxFhIHB6au1kiSd3iuBgGehHOhI/exec';
 var CFG = null;
+try{ localStorage.removeItem('ata3.apiUrl'); }catch(e){}
 function cfgValida(c){ return !!(c && c.api && c.token); }
 function cfg(){
   if(cfgValida(CFG)) return CFG;
@@ -447,7 +448,8 @@ function api(acao, extra){
   var body = Object.assign({ acao: acao, token: c.token }, extra||{});
   // text/plain evita o "preflight" CORS, que o Apps Script não responde.
   return fetch(c.api, { method:'POST', body: JSON.stringify(body), headers:{'Content-Type':'text/plain;charset=utf-8'}, redirect:'follow' })
-    .then(function(r){ if(!r.ok) throw new Error('Servidor respondeu '+r.status); return r.json(); })
+    .catch(function(e){ throw new Error('Não consegui falar com o servidor ('+(e.message||e)+'). Confira a internet e tente de novo.'); })
+    .then(function(r){ if(!r.ok) throw new Error('Servidor respondeu '+r.status); return r.json().catch(function(){ throw new Error('O servidor não respondeu direito. Tente de novo em instantes.'); }); })
     .then(function(j){ if(!j.ok){ if(j.codigo==='login' && acao!=='login'){ setTimeout(function(){ sairDoApp(j.erro); }, 0); } throw new Error(j.erro||'Erro desconhecido'); } return j; });
 }
 
@@ -462,9 +464,10 @@ function apiDeTexto(txt){
   var t=String(txt||'').trim(), i=t.indexOf('#'); if(i===-1) return '';
   return new URLSearchParams(t.slice(i+1)).get('api') || '';
 }
-function apiConhecida(){ return (CFG&&CFG.api) || apiDeTexto(location.hash) || (LS.get('cfg',null)||{}).api || LS.get('apiUrl','') || API_PADRAO; }
+/* Sem #api= no link, vale sempre o API_PADRAO: um endereço antigo guardado no aparelho (de testes) não pode mais vencer. */
+function apiConhecida(){ return (CFG&&CFG.api) || apiDeTexto(location.hash) || API_PADRAO; }
 function sairDoApp(msg){
-  var a=apiConhecida(); CFG=null; LS.del('cfg'); if(a) LS.set('apiUrl', a);
+  var a=apiConhecida(); CFG=null; LS.del('cfg');
   try{ sessionStorage.removeItem('ata3.cfg'); }catch(e){}
   try{ history.replaceState(null,'',location.pathname+location.search+(a?'#api='+encodeURIComponent(a):'')); }catch(e){}
   boot(); if(msg){ var e=$('cfg-err'); e.textContent=msg; e.hidden=false; }
@@ -490,7 +493,7 @@ function saveCfg(){
   if(!/^https:\/\/script\.google(usercontent)?\.com\//.test(a) && !/^https?:\/\/(localhost|127\.0\.0\.1)/.test(a)){ e.textContent='Abra o link do app que você recebeu (ou cole-o acima).'; e.hidden=false; return; }
   var email=$('cfg-email').value.trim(), senha=$('cfg-senha').value;
   if(!email || !senha){ e.textContent='Preencha e-mail e senha do Lupe.'; e.hidden=false; return; }
-  LS.set('apiUrl', a); CFG = { api:a, token:'' };
+  CFG = { api:a, token:'' };
   var b=$('cfg-save'); b.disabled=true; b.innerHTML='<span class="spin"></span>Entrando…';
   api('login', { email:email, senha:senha }).then(function(j){
     $('cfg-senha').value=''; LS.set('email', email);
