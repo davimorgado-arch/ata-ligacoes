@@ -534,9 +534,9 @@ function renderKanban(leads, buscando){
       '</section>';
   }).join('');
 }
-function loadLeads(silent){
-  if(!silent) $('count').textContent='Atualizando…';
-  return api('leads').then(function(j){
+function loadLeads(silent, forcar){
+  if(!silent) $('count').textContent= forcar ? 'Buscando no Lupe… (pode levar até 1 min)' : 'Atualizando…';
+  return api('leads', forcar ? { forcar:true } : {}).then(function(j){
     state.leads = j.leads || []; LS.set('leads', state.leads);
     var latest = state.leads.reduce(function(m,l){ return l.atualizado_em && l.atualizado_em>m ? l.atualizado_em : m; }, '');
     LS.set('leadsAt', latest || null);
@@ -1189,7 +1189,7 @@ $('au-tipo').addEventListener('click', function(ev){ var b=ev.target.closest('bu
 $('au-send').onclick=sendAudio;
 function auSair(){ if((recording() || (state.audio&&state.audio.blob)) && !confirm('Descartar este áudio?')) return; recStop(); state.audio=null; show('s-list'); renderList(); }
 $('au-back').onclick=auSair; $('au-discard').onclick=auSair;
-$('btn-reload').onclick=function(){ loadLeads(false); flushOutbox(); };
+$('btn-reload').onclick=function(){ loadLeads(false, true); flushOutbox(); };
 $('btn-pause').onclick=function(){ state.call.running ? pauseCall() : resumeCall(); };
 $('btn-end').onclick=endCall;
 $('notas').addEventListener('input', function(){ if(state.call){ state.call.notas=this.value; draft(); } });
