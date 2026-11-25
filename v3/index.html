@@ -185,6 +185,23 @@ audio{width:100%}
 .d-del.on{visibility:visible}
 .d-del svg{width:30px;height:30px}
 .dialer .sw{width:100%;max-width:420px}
+.d-tabs{width:100%;max-width:420px;display:flex;background:#eef2f1;border-radius:12px;padding:3px;margin-top:8px}
+.d-tabs button{flex:1;background:none;border-radius:10px;padding:9px 0;font-weight:700;font-size:15px;color:var(--muted)}
+.d-tabs button.on{background:#fff;color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.d-pane{width:100%;display:flex;flex-direction:column;align-items:center}
+.d-pane[hidden]{display:none!important}
+.ctts{width:100%;max-width:420px;margin-top:10px}
+.ctt-h{font-size:12px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);margin:14px 4px 6px}
+.ctt{display:flex;align-items:center;gap:12px;padding:10px 4px;border-bottom:1px solid var(--line);text-decoration:none;color:var(--text)}
+.ctt:active{background:#f2f5f4}
+.ctt .av{width:42px;height:42px;border-radius:50%;background:var(--brand-soft);color:var(--brand);display:grid;place-items:center;font-weight:800;flex:0 0 auto}
+.ctt .tx2{flex:1;min-width:0}
+.ctt .tx2 b{display:block;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ctt .tx2 span{font-size:14px;color:var(--muted)}
+.ctt .ph{width:40px;height:40px;border-radius:50%;background:#34c759;color:#fff;display:grid;place-items:center;flex:0 0 auto}
+.ctt .ph svg{width:20px;height:20px}
+.ctt-vazio{text-align:center;color:var(--muted);padding:26px 10px;line-height:1.5}
+.ctt-vazio button{margin-top:12px;background:var(--brand-soft);color:var(--brand);font-weight:700;border-radius:10px;padding:10px 16px}
 /* avisos (navegador de app, tela de início) */
 .banner{margin:10px 14px 0;background:#fff6dc;color:#5c4200;border-radius:14px;padding:12px 14px;font-size:14px;line-height:1.4}
 .banner .acts{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
@@ -376,16 +393,22 @@ a.btn{text-decoration:none}
     <div class="d-lead"><span id="dial-t">Ligar</span><b id="dial-nm">—</b></div>
     <button class="d-x" id="dial-paste" aria-label="Colar número">Colar</button>
   </div>
-  <div class="chips" id="dial-chips"></div>
+  <div class="d-tabs" role="tablist">
+    <button role="tab" data-tab="ctt" id="tab-ctt">Contatos</button>
+    <button role="tab" data-tab="tec" id="tab-tec">Teclado</button>
+  </div>
+  <div class="d-pane" id="pane-ctt"><div class="ctts" id="dial-ctts"></div></div>
+  <div class="d-pane" id="pane-tec">
   <div class="d-num"><input id="dial-num" type="tel" inputmode="none" autocomplete="off" aria-label="Número" placeholder="Digite o número"></div>
   <div class="d-fmt" id="dial-fmt">&nbsp;</div>
-  <div class="note err" id="dial-err" hidden></div>
   <div class="keypad" id="keypad"><button class="key" data-k="1" aria-label="1"><b>1</b><small>&nbsp;</small></button><button class="key" data-k="2" aria-label="2"><b>2</b><small>ABC</small></button><button class="key" data-k="3" aria-label="3"><b>3</b><small>DEF</small></button><button class="key" data-k="4" aria-label="4"><b>4</b><small>GHI</small></button><button class="key" data-k="5" aria-label="5"><b>5</b><small>JKL</small></button><button class="key" data-k="6" aria-label="6"><b>6</b><small>MNO</small></button><button class="key" data-k="7" aria-label="7"><b>7</b><small>PQRS</small></button><button class="key" data-k="8" aria-label="8"><b>8</b><small>TUV</small></button><button class="key" data-k="9" aria-label="9"><b>9</b><small>WXYZ</small></button><button class="key" data-k="*" aria-label="*"><b>*</b><small>&nbsp;</small></button><button class="key" data-k="0" aria-label="0"><b>0</b><small>+</small></button><button class="key" data-k="#" aria-label="#"><b>#</b><small>&nbsp;</small></button></div>
   <div class="d-call">
     <span></span>
     <a class="callbtn" id="dial-go" href="tel:" aria-label="Discar e iniciar"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1Z"/></svg></a>
     <button class="d-del" id="dial-del" aria-label="Apagar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 5H8l-6 7 6 7h13a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1Z"/><path d="m11 9 6 6m0-6-6 6"/></svg></button>
   </div>
+  </div>
+  <div class="note err" id="dial-err" hidden style="margin-top:12px"></div>
   <div class="sw" id="dial-sw" hidden>
     <input type="checkbox" id="dial-rec">
     <div><label for="dial-rec">Gravar a ligação no viva-voz</label>
@@ -823,21 +846,45 @@ function telefonesDe(l){
   LS.get('tel.'+l.lead_id, []).concat(lista).forEach(function(t){ t=String(t||'').trim(); var k=digits(t); if(k.length>=8 && !vistos[k]){ vistos[k]=1; out.push(t); } });
   return out;
 }
+var TEL_SVG='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1Z"/></svg>';
+function dialAba(t){
+  $('tab-ctt').classList.toggle('on', t==='ctt'); $('tab-tec').classList.toggle('on', t==='tec');
+  $('pane-ctt').hidden = t!=='ctt'; $('pane-tec').hidden = t!=='tec';
+  $('dial-paste').style.visibility = t==='tec' ? '' : 'hidden';
+  dialErr('');
+}
+function iniciais(n){ var p=String(n||'').trim().split(/\s+/); return ((p[0]||'?').charAt(0)+(p.length>1?p[p.length-1].charAt(0):'')).toUpperCase(); }
+function cttHtml(nome, sub, num){
+  return '<a class="ctt" href="'+esc(telHref(num))+'" data-num="'+esc(num)+'"><span class="av">'+esc(iniciais(nome||'#'))+'</span>'+
+    '<span class="tx2"><b>'+esc(nome||fmtTel(num))+'</b><span>'+esc(sub)+'</span></span><span class="ph">'+TEL_SVG+'</span></a>';
+}
+/** Aba Contatos: interlocutores do Lupe (nome, cargo, cada telefone) + números já discados neste lead. */
+function renderCtts(){
+  var d=Dial, h='', vistos={};
+  if(d.contatos && d.contatos.length){
+    h+='<div class="ctt-h">Contatos do lead no Lupe</div>';
+    d.contatos.forEach(function(c){ vistos[digits(c.numero)]=1; h+=cttHtml(c.nome, [c.tipo, fmtTel(c.numero), c.cargo].filter(Boolean).join(' · '), c.numero); });
+  }
+  var outros=d.salvos.filter(function(t){ var k=digits(t); if(vistos[k]) return false; vistos[k]=1; return true; });
+  if(outros.length){ h+='<div class="ctt-h">'+(d.contatos&&d.contatos.length?'Outros números':'Números deste lead')+'</div>'; outros.forEach(function(t){ h+=cttHtml('', 'Discado antes / cadastro do lead', t); }); }
+  if(d.carregando) h+='<div class="ctt-vazio"><span class="spin" style="display:inline-block;vertical-align:middle;width:18px;height:18px;border-color:#cfe3e0;border-top-color:var(--brand);margin-right:6px"></span>Buscando contatos no Lupe…</div>';
+  else if(!h) h='<div class="ctt-vazio">Este lead não tem contato com telefone no Lupe'+(d.erro?' (ou não consegui buscar: '+esc(d.erro)+')':'')+'.<br><button data-tab="tec">Digitar o número</button></div>';
+  $('dial-ctts').innerHTML=h;
+}
+var Dial={ contatos:null, salvos:[], carregando:false, erro:'' };
 function openDial(){
   var l=state.sel; if(!l) return;
   if(state.dialGrav){ gravParar(state.dialGrav); state.dialGrav=null; }
-  var tels=telefonesDe(l);
+  Dial={ contatos:null, salvos:telefonesDe(l), carregando:true, erro:'' };
   $('dial-nm').textContent=(l.empresa||l.razao_social||'')+'  #'+l.lead_id;
-  $('dial-chips').innerHTML=tels.map(function(t){ return '<button data-tel="'+esc(t)+'">'+esc(t)+'</button>'; }).join('');
-  setNum(tels[0]||'');
+  setNum('');
+  dialAba('ctt'); renderCtts();
   api('telefones', { lead_id:l.lead_id }).then(function(j){
-    if(state.sel!==l || !$('dial').classList.contains('on')) return;
-    var vistos={}; tels.forEach(function(t){ vistos[digits(t)]=1; });
-    var novos=(j.telefones||[]).filter(function(t){ var k=digits(t.numero); if(vistos[k]) return false; vistos[k]=1; return true; });
-    if(!novos.length) return;
-    $('dial-chips').innerHTML += novos.map(function(t){ return '<button data-tel="'+esc(t.numero)+'">'+esc((t.nome?t.nome.split(' ')[0]+': ':'')+fmtTel(t.numero))+'</button>'; }).join('');
-    if(!telLimpo($('dial-num').value)) setNum(novos[0].numero);
-  }).catch(function(){});
+    if(state.sel!==l) return;
+    Dial.contatos=(j.telefones||[]);
+  }).catch(function(e){ Dial.erro=e.message; })
+    .finally(function(){ if(state.sel!==l) return; Dial.carregando=false; renderCtts();
+      if(!(Dial.contatos&&Dial.contatos.length) && !Dial.salvos.length && $('dial').classList.contains('on')) dialAba('tec'); });
   $('dial-sw').hidden = !state.srv.audio_na_ligacao;
   $('dial-rec').checked=false; $('dial-rec').disabled=!micDisponivel(); $('dial-err').hidden=true;
   $('dial-rec-h').textContent = micDisponivel()
@@ -1200,7 +1247,12 @@ $('dial-num').addEventListener('input', function(){ setNum(this.value); });
     } else { $('dial-num').focus(); toast('Toque e segure no número > Colar.'); }
   });
 })();
-$('dial-chips').addEventListener('click', function(ev){ var b=ev.target.closest('button'); if(b) setNum(b.getAttribute('data-tel')); });
+document.querySelector('.d-tabs').addEventListener('click', function(ev){ var b=ev.target.closest('[data-tab]'); if(b) dialAba(b.getAttribute('data-tab')); });
+$('dial-ctts').addEventListener('click', function(ev){
+  var b=ev.target.closest('[data-tab]'); if(b){ dialAba(b.getAttribute('data-tab')); return; }
+  var a=ev.target.closest('a.ctt'); if(!a) return;
+  setNum(a.getAttribute('data-num')); dialGo(ev); // o href tel: do próprio contato abre o discador do celular
+});
 $('dial-rec').addEventListener('click', dialRecToggle);
 $('dial-go').addEventListener('click', dialGo);
 $('dial-cancel').onclick=function(){ closeDial(true); }; $('dial-bg').onclick=function(){ closeDial(true); };
