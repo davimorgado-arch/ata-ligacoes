@@ -201,6 +201,10 @@ audio{width:100%}
 .ctt .ph{width:40px;height:40px;border-radius:50%;background:#34c759;color:#fff;display:grid;place-items:center;flex:0 0 auto}
 .ctt .ph svg{width:20px;height:20px}
 .ctt-vazio{text-align:center;color:var(--muted);padding:26px 10px;line-height:1.5}
+.ctt-nada{color:var(--muted);font-size:14px;line-height:1.45;padding:6px 4px 4px}
+.ctt-nada button{display:inline-block;margin-top:8px;background:var(--brand-soft);color:var(--brand);font-weight:700;border-radius:10px;padding:9px 14px}
+.ctt-ag{display:flex;align-items:center;gap:12px;width:100%;padding:10px 4px;color:var(--brand);font-weight:700;font-size:16px;text-align:left;background:none}
+.ctt-ag .av{width:42px;height:42px;border-radius:50%;border:2px dashed var(--brand);display:grid;place-items:center;font-size:22px;flex:0 0 auto}
 .ctt-vazio button{margin-top:12px;background:var(--brand-soft);color:var(--brand);font-weight:700;border-radius:10px;padding:10px 16px}
 /* avisos (navegador de app, tela de início) */
 .banner{margin:10px 14px 0;background:#fff6dc;color:#5c4200;border-radius:14px;padding:12px 14px;font-size:14px;line-height:1.4}
@@ -858,24 +862,49 @@ function cttHtml(nome, sub, num){
   return '<a class="ctt" href="'+esc(telHref(num))+'" data-num="'+esc(num)+'"><span class="av">'+esc(iniciais(nome||'#'))+'</span>'+
     '<span class="tx2"><b>'+esc(nome||fmtTel(num))+'</b><span>'+esc(sub)+'</span></span><span class="ph">'+TEL_SVG+'</span></a>';
 }
-/** Aba Contatos: interlocutores do Lupe (nome, cargo, cada telefone) + números já discados neste lead. */
+/** Aba Contatos: interlocutores do Lupe + números já discados + agenda do celular (Contact Picker, só Android/Chrome). */
+var AGENDA_OK = !!(navigator.contacts && navigator.contacts.select && window.ContactsManager);
 function renderCtts(){
   var d=Dial, h='', vistos={};
+  h+='<div class="ctt-h">Contatos do lead no Lupe</div>';
   if(d.contatos && d.contatos.length){
-    h+='<div class="ctt-h">Contatos do lead no Lupe</div>';
     d.contatos.forEach(function(c){ vistos[digits(c.numero)]=1; h+=cttHtml(c.nome, [c.tipo, fmtTel(c.numero), c.cargo].filter(Boolean).join(' · '), c.numero); });
+  } else if(d.carregando){
+    h+='<div class="ctt-vazio"><span class="spin" style="display:inline-block;vertical-align:middle;width:18px;height:18px;border-color:#cfe3e0;border-top-color:var(--brand);margin-right:6px"></span>Buscando contatos no Lupe…</div>';
+  } else {
+    h+='<div class="ctt-nada">Nenhum contato com telefone no Lupe'+(d.erro?' (não consegui buscar: '+esc(d.erro)+')':'')+'.</div>';
   }
   var outros=d.salvos.filter(function(t){ var k=digits(t); if(vistos[k]) return false; vistos[k]=1; return true; });
-  if(outros.length){ h+='<div class="ctt-h">'+(d.contatos&&d.contatos.length?'Outros números':'Números deste lead')+'</div>'; outros.forEach(function(t){ h+=cttHtml('', 'Discado antes / cadastro do lead', t); }); }
-  if(d.carregando) h+='<div class="ctt-vazio"><span class="spin" style="display:inline-block;vertical-align:middle;width:18px;height:18px;border-color:#cfe3e0;border-top-color:var(--brand);margin-right:6px"></span>Buscando contatos no Lupe…</div>';
-  else if(!h) h='<div class="ctt-vazio">Este lead não tem contato com telefone no Lupe'+(d.erro?' (ou não consegui buscar: '+esc(d.erro)+')':'')+'.<br><button data-tab="tec">Digitar o número</button></div>';
+  if(outros.length){ h+='<div class="ctt-h">Números já usados neste lead</div>'; outros.forEach(function(t){ h+=cttHtml('', 'Discado antes / cadastro do lead', t); }); }
+  h+='<div class="ctt-h">Agenda do celular</div>';
+  d.agenda.filter(function(c){ var k=digits(c.numero); if(vistos[k]) return false; vistos[k]=1; return true; })
+    .forEach(function(c){ h+=cttHtml(c.nome, 'Agenda · '+fmtTel(c.numero), c.numero); });
+  if(AGENDA_OK) h+='<button class="ctt-ag" data-agenda="1"><span class="av">+</span><span>Escolher contato da agenda</span></button>';
+  else h+='<div class="ctt-nada">Neste celular o navegador não deixa o app abrir a agenda (o iPhone não permite). Abra o app Contatos, copie o número e cole aqui:<br><button data-tab="tec">Abrir o teclado para colar</button></div>';
   $('dial-ctts').innerHTML=h;
 }
-var Dial={ contatos:null, salvos:[], carregando:false, erro:'' };
+function agendaEscolher(){
+  var l=state.sel; if(!l) return;
+  navigator.contacts.select(['name','tel'], { multiple:true }).then(function(cs){
+    var novos=[];
+    (cs||[]).forEach(function(c){
+      var nome=(c.name&&c.name[0])||'';
+      (c.tel||[]).forEach(function(t){ if(digits(t).length>=8) novos.push({ nome:nome, numero:String(t).trim() }); });
+    });
+    if(!novos.length){ if(cs&&cs.length) toast('Esse contato não tem telefone.'); return; }
+    var lista=novos.concat(LS.get('agenda.'+l.lead_id, [])), vist={};
+    lista=lista.filter(function(c){ var k=digits(c.numero); if(vist[k]) return false; vist[k]=1; return true; }).slice(0,8);
+    LS.set('agenda.'+l.lead_id, lista); // lembra os contatos da agenda escolhidos para este lead
+    if(state.sel!==l) return;
+    Dial.agenda=lista; renderCtts();
+    toast(novos.length===1 ? 'Toque no contato para ligar.' : 'Toque no número para ligar.');
+  }).catch(function(e){ toast('Não consegui abrir a agenda: '+(e&&e.message||e)); });
+}
+var Dial={ contatos:null, salvos:[], agenda:[], carregando:false, erro:'' };
 function openDial(){
   var l=state.sel; if(!l) return;
   if(state.dialGrav){ gravParar(state.dialGrav); state.dialGrav=null; }
-  Dial={ contatos:null, salvos:telefonesDe(l), carregando:true, erro:'' };
+  Dial={ contatos:null, salvos:telefonesDe(l), agenda:LS.get('agenda.'+l.lead_id, []), carregando:true, erro:'' };
   $('dial-nm').textContent=(l.empresa||l.razao_social||'')+'  #'+l.lead_id;
   setNum('');
   dialAba('ctt'); renderCtts();
@@ -884,7 +913,7 @@ function openDial(){
     Dial.contatos=(j.telefones||[]);
   }).catch(function(e){ Dial.erro=e.message; })
     .finally(function(){ if(state.sel!==l) return; Dial.carregando=false; renderCtts();
-      if(!(Dial.contatos&&Dial.contatos.length) && !Dial.salvos.length && $('dial').classList.contains('on')) dialAba('tec'); });
+      if(!(Dial.contatos&&Dial.contatos.length) && !Dial.salvos.length && !Dial.agenda.length && !AGENDA_OK && $('dial').classList.contains('on')) dialAba('tec'); });
   $('dial-sw').hidden = !state.srv.audio_na_ligacao;
   $('dial-rec').checked=false; $('dial-rec').disabled=!micDisponivel(); $('dial-err').hidden=true;
   $('dial-rec-h').textContent = micDisponivel()
@@ -1250,6 +1279,7 @@ $('dial-num').addEventListener('input', function(){ setNum(this.value); });
 document.querySelector('.d-tabs').addEventListener('click', function(ev){ var b=ev.target.closest('[data-tab]'); if(b) dialAba(b.getAttribute('data-tab')); });
 $('dial-ctts').addEventListener('click', function(ev){
   var b=ev.target.closest('[data-tab]'); if(b){ dialAba(b.getAttribute('data-tab')); return; }
+  if(ev.target.closest('[data-agenda]')){ agendaEscolher(); return; }
   var a=ev.target.closest('a.ctt'); if(!a) return;
   setNum(a.getAttribute('data-num')); dialGo(ev); // o href tel: do próprio contato abre o discador do celular
 });
